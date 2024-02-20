@@ -9,7 +9,7 @@ class Lyric(models.Model):
     song = models.ForeignKey("songs.Song", on_delete=models.CASCADE)
 
     def __str__(self):
-        return self.song.name
+        return f'lyrics for {self.song.name}'
 
 
 class LyricLineTimecode(models.Model):

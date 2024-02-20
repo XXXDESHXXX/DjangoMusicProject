@@ -11,7 +11,7 @@ class PlaylistSong(models.Model):
                              )
 
     def __str__(self):
-        return self.song.name
+        return f'Playlist of {self.song.name}'
 
 
 class Playlist(models.Model):

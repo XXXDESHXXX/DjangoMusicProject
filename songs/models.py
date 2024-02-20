@@ -9,3 +9,6 @@ class Song(models.Model):
     name = models.CharField(max_length=64)
     genre = models.ForeignKey(Genre, on_delete=models.PROTECT)
     user = models.ForeignKey(User, on_delete=models.PROTECT)
+
+    def __str__(self):
+        return self.name

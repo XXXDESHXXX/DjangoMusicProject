@@ -4,4 +4,4 @@ from .models import Song
 
 @admin.register(Song)
 class SongAdmin(admin.ModelAdmin):
-    list_display = ['name', 'genre', 'user']
+    list_display = ('name', 'genre', 'user')
