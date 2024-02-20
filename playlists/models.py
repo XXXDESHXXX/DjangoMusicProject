@@ -10,6 +10,9 @@ class PlaylistSong(models.Model):
                              on_delete=models.CASCADE
                              )
 
+    def __str__(self):
+        return self.song.name
+
 
 class Playlist(models.Model):
     name = models.CharField(max_length=64)
@@ -23,3 +26,13 @@ class Playlist(models.Model):
                              on_delete=models.PROTECT
                              )
     songs = models.ManyToManyField(PlaylistSong)
+
+    class Meta:
+        ordering = ['-created_at']
+        indexes = [
+            models.Index(fields=['-created_at'])
+        ]
+
+    def __str__(self):
+        return f'Playlist {self.name} by {self.user}'
+
