@@ -35,4 +35,3 @@ class Playlist(models.Model):
 
     def __str__(self):
         return f'Playlist {self.name} by {self.user}'
-
