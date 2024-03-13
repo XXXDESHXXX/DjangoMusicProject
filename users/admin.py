@@ -10,5 +10,5 @@ class UserFollowAdmin(admin.ModelAdmin):
 
 @admin.register(User)
 class UserAdmin(admin.ModelAdmin):
-    list_display = ('username', 'role', 'image', 'is_private')
+    list_display = ('id', 'username', 'role', 'image', 'is_private')
     list_filter = ('is_private', 'role')
