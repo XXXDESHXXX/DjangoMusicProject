@@ -10,4 +10,4 @@ class UserSongLikeAdmin(admin.ModelAdmin):
 
 @admin.register(Song)
 class SongAdmin(admin.ModelAdmin):
-    list_display = ('name', 'genre', 'user')
+    list_display = ('id', 'name', 'genre', 'user')
