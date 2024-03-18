@@ -5,7 +5,7 @@ from songs.models import UserSongLike
 class UserSongLikeSerializer(serializers.ModelSerializer):
     class Meta:
         model = UserSongLike
-        fields = ('id', 'user', 'created_at')
+        fields = ('id', 'user', 'liked_song', 'created_at')
         read_only_fields = ('created',)
 
 

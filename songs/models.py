@@ -9,6 +9,10 @@ class UserSongLike(models.Model):
         User,
         on_delete=models.CASCADE
     )
+    liked_song = models.ForeignKey(
+        "songs.Song",
+        on_delete=models.CASCADE
+    )
     created_at = models.DateTimeField(auto_now_add=True)
 
 
