@@ -14,7 +14,7 @@ class GenreSerializerTest(TestCase):
 
     def test_id_field_content(self):
         data = self.serializer.data
-        self.assertEqual(data['id'], self.genre.id)
+        self.assertEqual(data['id'], self.genre.id) 
 
     def test_name_field_content(self):
         data = self.serializer.data
