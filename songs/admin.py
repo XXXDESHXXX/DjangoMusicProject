@@ -4,10 +4,10 @@ from .models import Song, UserSongLike
 
 @admin.register(UserSongLike)
 class UserSongLikeAdmin(admin.ModelAdmin):
-    list_display = ('user',)
-    list_filter = ('created_at',)
+    list_display = ("user",)
+    list_filter = ("created_at",)
 
 
 @admin.register(Song)
 class SongAdmin(admin.ModelAdmin):
-    list_display = ('id', 'name', 'genre', 'user')
+    list_display = ("id", "name", "genre", "user")

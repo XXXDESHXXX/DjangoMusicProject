@@ -7,14 +7,16 @@ import django.db.models.deletion
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('songs', '0002_usersonglike_song_likes'),
+        ("songs", "0002_usersonglike_song_likes"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='usersonglike',
-            name='liked_song',
-            field=models.ForeignKey(default=1, on_delete=django.db.models.deletion.CASCADE, to='songs.song'),
+            model_name="usersonglike",
+            name="liked_song",
+            field=models.ForeignKey(
+                default=1, on_delete=django.db.models.deletion.CASCADE, to="songs.song"
+            ),
             preserve_default=False,
         ),
     ]

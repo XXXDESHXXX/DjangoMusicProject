@@ -4,4 +4,4 @@ from .models import Genre
 
 @admin.register(Genre)
 class GenreAdmin(admin.ModelAdmin):
-    list_display = ('name',)
+    list_display = ("name",)

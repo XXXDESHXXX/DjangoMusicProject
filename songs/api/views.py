@@ -4,7 +4,11 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.serializers import Serializer
 
-from songs.api.serializers import UserSongLikeSerializer, UserSongLikeCreateSerializer, SongSerializer
+from songs.api.serializers import (
+    UserSongLikeSerializer,
+    UserSongLikeCreateSerializer,
+    SongSerializer,
+)
 from songs.models import UserSongLike, Song
 from users.models import UserFollow, User
 
@@ -22,8 +26,13 @@ class UserSongLikeCreateAPIView(CreateAPIView):
         user = self.request.user
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
-        if UserSongLike.objects.filter(user=user, liked_song=serializer.validated_data["liked_song"]):
-            return Response({"detail": "You cannot like the same song twice"}, status=status.HTTP_400_BAD_REQUEST)
+        if UserSongLike.objects.filter(
+            user=user, liked_song=serializer.validated_data["liked_song"]
+        ):
+            return Response(
+                {"detail": "You cannot like the same song twice"},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
         return super().create(request, *args, **kwargs)
 
 

@@ -9,9 +9,9 @@ from genres.api.serializers import GenreSerializer
 class GenreListViewTest(TestCase):
     def setUp(self):
         self.client = APIClient()
-        self.url = reverse('genres:api:genre_list')
-        self.genre1 = Genre.objects.create(name='Genre 1')
-        self.genre2 = Genre.objects.create(name='Genre 2')
+        self.url = reverse("genres:api:genre_list")
+        self.genre1 = Genre.objects.create(name="Genre 1")
+        self.genre2 = Genre.objects.create(name="Genre 2")
 
     def test_get_genre_list(self):
         response = self.client.get(self.url)
