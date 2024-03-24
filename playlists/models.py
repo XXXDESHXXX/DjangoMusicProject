@@ -9,7 +9,7 @@ class PlaylistSong(models.Model):
     song = models.ForeignKey(Song, on_delete=models.CASCADE)
 
     def __str__(self):
-        return f"Playlist of {self.song.name}"
+        return f"Song {self.song.name}"
 
 
 class Playlist(models.Model):
