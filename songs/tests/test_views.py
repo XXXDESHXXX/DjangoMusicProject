@@ -8,7 +8,7 @@ from users.models import User
 
 
 class SongListAPIViewTest(APITestCase):
-    def setUp(self):
+    def setUp(self) -> None:
         self.user = User.objects.create_user(
             username="test_user", password="test_password"
         )
@@ -20,7 +20,7 @@ class SongListAPIViewTest(APITestCase):
             name="Song 2", file="song2.mp3", genre=genre, user=self.user
         )
 
-    def test_song_list(self):
+    def test_song_list(self) -> None:
         url = reverse("songs:api:song_list")
         client = APIClient()
         response = client.get(url)
@@ -33,7 +33,7 @@ class SongListAPIViewTest(APITestCase):
                 song_data["file"], f"http://testserver{expected_song.file.url}"
             )
 
-    def test_song_list_empty(self):
+    def test_song_list_empty(self) -> None:
         Song.objects.all().delete()
         url = reverse("songs:api:song_list")
         response = self.client.get(url)

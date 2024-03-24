@@ -6,7 +6,7 @@ from songs.api.serializers import SongSerializer
 
 
 class SongSerializerTest(TestCase):
-    def setUp(self):
+    def setUp(self) -> None:
         genre = Genre.objects.create(name="Rock")
         user = User.objects.create(username="test_user")
         song = Song.objects.create(
@@ -14,7 +14,7 @@ class SongSerializerTest(TestCase):
         )
         UserSongLike.objects.create(user=user, liked_song=song)
 
-    def test_song_serializer(self):
+    def test_song_serializer(self) -> None:
         song = Song.objects.first()
         serializer = SongSerializer(song)
 
@@ -24,7 +24,7 @@ class SongSerializerTest(TestCase):
         self.assertEqual(serializer.data["genre"], song.genre.id)
         self.assertEqual(serializer.data["user"], song.user.id)
 
-    def test_song_serializer_fields(self):
+    def test_song_serializer_fields(self) -> None:
         serializer = SongSerializer()
         expected_fields = ["id", "name", "file", "likes", "genre", "user"]
         self.assertEqual(set(serializer.fields.keys()), set(expected_fields))
