@@ -17,6 +17,9 @@ class UserFollow(models.Model):
         ]
         ordering = ["-created"]
 
+    def __str__(self):
+        return f"User{self.user_from} subscribed {self.user_to}"
+
 
 class User(AbstractUser):
     class RoleChoices(models.TextChoices):
