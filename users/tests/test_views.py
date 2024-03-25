@@ -11,15 +11,16 @@ class UserFollowCreateAPIViewTestCase(TestCase):
     def setUp(self):
         self.factory = APIRequestFactory()
         self.client = APIClient()
-        self.user = User.objects.create_user(username="test_user", password="testpassword")
-        self.user2 = User.objects.create_user(username="test_user2", password="testpassword")
+        self.user = User.objects.create_user(
+            username="test_user", password="testpassword"
+        )
+        self.user2 = User.objects.create_user(
+            username="test_user2", password="testpassword"
+        )
 
     def test_user_follow_create_api_view_authenticated_user(self):
         request = self.factory.post(
-            "/api/user_follow_create/",
-            data={
-                "user_to": self.user2.id
-            }
+            "/api/user_follow_create/", data={"user_to": self.user2.id}
         )
         request.user = self.user
 
@@ -27,7 +28,9 @@ class UserFollowCreateAPIViewTestCase(TestCase):
 
         self.assertEqual(response.status_code, HTTPStatus.CREATED)
 
-        self.assertTrue(UserFollow.objects.filter(user_from=self.user, user_to=self.user2).exists())
+        self.assertTrue(
+            UserFollow.objects.filter(user_from=self.user, user_to=self.user2).exists()
+        )
 
     def test_user_follow_create_api_view_anonymous_user(self):
         request = self.factory.post("/api/user-follow-create/")
@@ -37,4 +40,6 @@ class UserFollowCreateAPIViewTestCase(TestCase):
 
         self.assertEqual(response.status_code, HTTPStatus.FORBIDDEN)
 
-        self.assertFalse(UserFollow.objects.filter(user_from=self.user, user_to=self.user2).exists())
+        self.assertFalse(
+            UserFollow.objects.filter(user_from=self.user, user_to=self.user2).exists()
+        )

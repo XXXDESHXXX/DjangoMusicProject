@@ -17,7 +17,7 @@ class UserPlaylistListAPIView(generics.ListAPIView):
     serializer_class = PlaylistSerializer
 
     def get_queryset(self) -> Response:
-        user_id = self.kwargs['user_id']
+        user_id = self.kwargs.get("user_id")
         return Playlist.objects.filter(user_id=user_id)
 
 
@@ -35,10 +35,9 @@ class PlaylistDeleteAPIView(generics.DestroyAPIView):
     serializer_class = PlaylistSerializer
 
     def get_object(self) -> Playlist:
-        return get_object_or_404(Playlist,
-                                 user=self.request.user,
-                                 id=self.kwargs.get("playlist_id")
-                                 )
+        return get_object_or_404(
+            Playlist, user=self.request.user, id=self.kwargs.get("playlist_id")
+        )
 
 
 class PlaylistUpdateAPIView(generics.UpdateAPIView):
@@ -46,9 +45,9 @@ class PlaylistUpdateAPIView(generics.UpdateAPIView):
     serializer_class = PlaylistSerializer
 
     def get_object(self) -> Playlist:
-        return get_object_or_404(Playlist,
-                                 user=self.request.user,
-                                 id=self.kwargs.get("playlist_id"))
+        return get_object_or_404(
+            Playlist, user=self.request.user, id=self.kwargs.get("playlist_id")
+        )
 
 
 class PlaylistSongCreateAPIView(generics.CreateAPIView):
@@ -65,6 +64,4 @@ class PlaylistSongDeleteAPIView(generics.DestroyAPIView):
     serializer_class = PlaylistSongSerializer
 
     def get_object(self) -> PlaylistSong:
-        return get_object_or_404(PlaylistSong,
-                                 id=self.kwargs.get("playlist_id")
-                                 )
+        return get_object_or_404(PlaylistSong, id=self.kwargs.get("playlist_id"))
