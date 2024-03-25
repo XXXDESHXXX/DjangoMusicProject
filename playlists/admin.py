@@ -4,7 +4,7 @@ from .models import Playlist, PlaylistSong
 
 @admin.register(Playlist)
 class PlaylistAdmin(admin.ModelAdmin):
-    list_display = ("name", "image", "created_at", "is_private", "description", "user")
+    list_display = ("id", "name", "image", "created_at", "is_private", "description", "user")
     list_filter = ("created_at", "updated_at", "is_private")
     search_fields = ("name", "description")
 
