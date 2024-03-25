@@ -5,7 +5,7 @@ from rest_framework.response import Response
 from rest_framework.serializers import Serializer
 
 from playlists.models import Playlist
-from .serializers import PlaylistSerializer
+from .serializers import PlaylistSerializer, PlaylistSongSerializer
 
 
 class PlaylistListAPIView(generics.ListAPIView):
@@ -48,4 +48,13 @@ class PlaylistUpdateAPIView(generics.UpdateAPIView):
     def get_object(self) -> Playlist:
         return get_object_or_404(Playlist,
                                  user=self.request.user,
-                                 id=self.kwargs["playlist_id"])
+                                 id=self.kwargs.get("playlist_id"))
+
+
+class PlaylistSongCreateAPIView(generics.CreateAPIView):
+    permission_classes = (IsAuthenticated,)
+    serializer_class = PlaylistSongSerializer
+
+    def perform_create(self, serializer: Serializer):
+        playlist = get_object_or_404(Playlist, id=self.kwargs.get("playlist_id"))
+        serializer.save(playlist=playlist)
