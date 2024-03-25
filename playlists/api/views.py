@@ -39,3 +39,13 @@ class PlaylistDeleteAPIView(generics.DestroyAPIView):
                                  user=self.request.user,
                                  id=self.kwargs.get("playlist_id")
                                  )
+
+
+class PlaylistUpdateAPIView(generics.UpdateAPIView):
+    permission_classes = (IsAuthenticated,)
+    serializer_class = PlaylistSerializer
+
+    def get_object(self) -> Playlist:
+        return get_object_or_404(Playlist,
+                                 user=self.request.user,
+                                 id=self.kwargs["playlist_id"])
