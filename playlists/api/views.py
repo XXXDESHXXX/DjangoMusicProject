@@ -4,7 +4,7 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.serializers import Serializer
 
-from playlists.models import Playlist
+from playlists.models import Playlist, PlaylistSong
 from .serializers import PlaylistSerializer, PlaylistSongSerializer
 
 
@@ -55,6 +55,16 @@ class PlaylistSongCreateAPIView(generics.CreateAPIView):
     permission_classes = (IsAuthenticated,)
     serializer_class = PlaylistSongSerializer
 
-    def perform_create(self, serializer: Serializer):
+    def perform_create(self, serializer: Serializer) -> None:
         playlist = get_object_or_404(Playlist, id=self.kwargs.get("playlist_id"))
         serializer.save(playlist=playlist)
+
+
+class PlaylistSongDeleteAPIView(generics.DestroyAPIView):
+    permission_classes = (IsAuthenticated,)
+    serializer_class = PlaylistSongSerializer
+
+    def get_object(self) -> PlaylistSong:
+        return get_object_or_404(PlaylistSong,
+                                 id=self.kwargs.get("playlist_id")
+                                 )
