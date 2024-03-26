@@ -6,7 +6,7 @@ from genres.models import Genre
 from genres.api.serializers import GenreSerializer
 
 
-class GenreListViewTest(TestCase):
+class GenreListAPIViewTest(TestCase):
     def setUp(self):
         self.client = APIClient()
         self.url = reverse("genres:api:genre_list")

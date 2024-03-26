@@ -54,12 +54,14 @@ class PlaylistSerializerTest(TestCase):
         self.assertEqual(data["description"], self.playlist_data["description"])
 
 
-class PlaylistSongSerializerTestCase(TestCase):
+class PlaylistSongSerializerTest(TestCase):
     def setUp(self):
         self.genre = Genre.objects.create(name="Rock")
         self.user = User.objects.create(username="test_user")
         self.playlist = Playlist.objects.create(user=self.user, name="Test Playlist")
-        self.song = Song.objects.create(name="Example Song", genre_id=self.genre.id, user=self.user)
+        self.song = Song.objects.create(
+            name="Example Song", genre_id=self.genre.id, user=self.user
+        )
         self.playlist_song_data = {
             "id": 1,
             "created_at": "2024-03-26T12:00:00Z",
@@ -71,8 +73,6 @@ class PlaylistSongSerializerTestCase(TestCase):
         self.assertTrue(self.serializer.is_valid())
 
     def test_invalid_data_missing_fields(self):
-        invalid_data = {
-            "created_at": "2024-03-26T12:00:00Z"
-        }
+        invalid_data = {"created_at": "2024-03-26T12:00:00Z"}
         serializer = PlaylistSongSerializer(data=invalid_data)
         self.assertFalse(serializer.is_valid())
