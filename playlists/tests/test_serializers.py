@@ -1,7 +1,13 @@
+from datetime import datetime, timezone
+
+from django.utils import timezone
 from django.test import TestCase
+
+from genres.models import Genre
+from songs.models import Song
 from users.models import User
-from playlists.models import Playlist
-from playlists.api.serializers import PlaylistSerializer
+from playlists.models import Playlist, PlaylistSong
+from playlists.api.serializers import PlaylistSerializer, PlaylistSongSerializer
 
 
 class PlaylistSerializerTest(TestCase):
@@ -46,3 +52,27 @@ class PlaylistSerializerTest(TestCase):
     def test_description_field_content(self):
         data = self.serializer.data
         self.assertEqual(data["description"], self.playlist_data["description"])
+
+
+class PlaylistSongSerializerTestCase(TestCase):
+    def setUp(self):
+        self.genre = Genre.objects.create(name="Rock")
+        self.user = User.objects.create(username="test_user")
+        self.playlist = Playlist.objects.create(user=self.user, name="Test Playlist")
+        self.song = Song.objects.create(name="Example Song", genre_id=self.genre.id, user=self.user)
+        self.playlist_song_data = {
+            "id": 1,
+            "created_at": "2024-03-26T12:00:00Z",
+            "song": self.song.id,
+        }
+        self.serializer = PlaylistSongSerializer(data=self.playlist_song_data)
+
+    def test_valid_data(self):
+        self.assertTrue(self.serializer.is_valid())
+
+    def test_invalid_data_missing_fields(self):
+        invalid_data = {
+            "created_at": "2024-03-26T12:00:00Z"
+        }
+        serializer = PlaylistSongSerializer(data=invalid_data)
+        self.assertFalse(serializer.is_valid())
