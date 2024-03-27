@@ -1,5 +1,6 @@
 from django.urls import reverse
 from rest_framework import status
+from rest_framework.response import Response
 from rest_framework.test import APITestCase, APIClient
 
 from playlists.models import Playlist
@@ -7,7 +8,7 @@ from users.models import User
 
 
 class PlaylistListAPIViewTest(APITestCase):
-    def setUp(self):
+    def setUp(self) -> None:
         self.user = User.objects.create(username="test_user")
         self.playlist1 = Playlist.objects.create(
             name="Playlist 1", description="Description 1", user_id=self.user.id
@@ -16,7 +17,7 @@ class PlaylistListAPIViewTest(APITestCase):
             name="Playlist 2", description="Description 2", user_id=self.user.id
         )
 
-    def test_get_playlists(self):
+    def test_get_playlists(self) -> None:
         url = reverse("playlists:api:list_of_playlists")
         response = self.client.get(url)
 
@@ -29,7 +30,7 @@ class PlaylistListAPIViewTest(APITestCase):
 
 
 class UserPlaylistListAPIViewTest(APITestCase):
-    def setUp(self):
+    def setUp(self) -> None:
         self.user = User.objects.create(username="test_user")
         self.client = APIClient()
         self.playlist1 = Playlist.objects.create(
@@ -39,7 +40,7 @@ class UserPlaylistListAPIViewTest(APITestCase):
             name="Playlist 2", description="Description 2", user_id=self.user.id
         )
 
-    def test_user_playlist_list(self):
+    def test_user_playlist_list(self) -> None:
         url = reverse("playlists:api:user_playlist_list", kwargs={"user_id": self.user.id})
         response = self.client.get(url)
 
@@ -56,11 +57,11 @@ class UserPlaylistListAPIViewTest(APITestCase):
 
 
 class PlaylistCreateAPIViewTest(APITestCase):
-    def setUp(self):
+    def setUp(self) -> None:
         self.user = User.objects.create_user(username='testuser', password='testpassword')
         self.client.force_authenticate(user=self.user)
 
-    def test_create_playlist(self):
+    def test_create_playlist(self) -> None:
         data = {'name': 'Test Playlist', "user": self.user.id}
 
         response = self.client.post(reverse("playlists:playlists:playlist_create"), data, format='json')
@@ -69,7 +70,7 @@ class PlaylistCreateAPIViewTest(APITestCase):
 
         self.assertTrue(Playlist.objects.filter(name='Test Playlist', user=self.user).exists())
 
-    def test_create_playlist_unauthenticated(self):
+    def test_create_playlist_unauthenticated(self) -> None:
         self.client.logout()
         data = {'name': 'Test Playlist'}
 
@@ -79,12 +80,12 @@ class PlaylistCreateAPIViewTest(APITestCase):
 
 
 class PlaylistDeleteAPIViewTest(APITestCase):
-    def setUp(self):
+    def setUp(self) -> None:
         self.user = User.objects.create_user(username='testuser', password='testpassword')
         self.playlist = Playlist.objects.create(user=self.user, name='Test Playlist')
         self.client.force_authenticate(user=self.user)
 
-    def test_delete_playlist(self):
+    def test_delete_playlist(self) -> None:
         url = reverse("playlists:api:playlist_delete", kwargs={'playlist_id': self.playlist.id})
 
         response = self.client.delete(url)
@@ -92,7 +93,7 @@ class PlaylistDeleteAPIViewTest(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
         self.assertFalse(Playlist.objects.filter(id=self.playlist.id).exists())
 
-    def test_delete_playlist_unauthenticated(self):
+    def test_delete_playlist_unauthenticated(self) -> None:
         self.client.logout()
         url = reverse("playlists:api:playlist_delete", kwargs={'playlist_id': self.playlist.id})
 
@@ -100,7 +101,7 @@ class PlaylistDeleteAPIViewTest(APITestCase):
 
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
 
-    def test_delete_playlist_wrong_user(self):
+    def test_delete_playlist_wrong_user(self) -> None:
         other_user = User.objects.create_user(username='otheruser', password='testpassword')
         self.client.force_authenticate(user=other_user)
         url = reverse("playlists:api:playlist_delete", kwargs={'playlist_id': self.playlist.id})
@@ -111,12 +112,12 @@ class PlaylistDeleteAPIViewTest(APITestCase):
 
 
 class PlaylistUpdateAPIViewTest(APITestCase):
-    def setUp(self):
+    def setUp(self) -> None:
         self.user = User.objects.create_user(username='testuser', password='testpassword')
         self.playlist = Playlist.objects.create(user=self.user, name='Test Playlist')
         self.client.force_authenticate(user=self.user)
 
-    def test_update_playlist(self):
+    def test_update_playlist(self) -> None:
         url = reverse("playlists:api:playlist_update", kwargs={'playlist_id': self.playlist.id})
         new_name = "Updated Playlist Name"
         data = {'name': new_name, "user": self.user.id}
@@ -127,7 +128,7 @@ class PlaylistUpdateAPIViewTest(APITestCase):
         self.playlist.refresh_from_db()
         self.assertEqual(self.playlist.name, new_name)
 
-    def _test_update_playlist_with_user(self, user):
+    def _test_update_playlist_with_user(self, user: User) -> Response:
         url = reverse("playlists:api:playlist_update", kwargs={'playlist_id': self.playlist.id})
         new_name = "Updated Playlist Name"
         data = {'name': new_name, "user": self.user.id}
@@ -137,11 +138,11 @@ class PlaylistUpdateAPIViewTest(APITestCase):
 
         return response
 
-    def test_update_playlist_unauthenticated(self):
+    def test_update_playlist_unauthenticated(self) -> None:
         response = self._test_update_playlist_with_user(None)
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
 
-    def test_update_playlist_wrong_user(self):
+    def test_update_playlist_wrong_user(self) -> None:
         other_user = User.objects.create_user(username='otheruser', password='testpassword')
         response = self._test_update_playlist_with_user(other_user)
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
