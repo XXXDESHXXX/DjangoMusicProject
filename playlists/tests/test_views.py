@@ -1,6 +1,7 @@
 from django.urls import reverse
 from rest_framework import status
-from rest_framework.test import APITestCase
+from rest_framework.test import APITestCase, APIClient
+
 from playlists.models import Playlist
 from users.models import User
 
@@ -25,3 +26,51 @@ class PlaylistListAPIViewTest(APITestCase):
 
         self.assertIn("Playlist 1", playlist_names)
         self.assertIn("Playlist 2", playlist_names)
+
+
+class UserPlaylistListAPIViewTest(APITestCase):
+    def setUp(self):
+        self.user = User.objects.create(username="test_user")
+        self.client = APIClient()
+        self.playlist1 = Playlist.objects.create(
+            name="Playlist 1", description="Description 1", user_id=self.user.id
+        )
+        self.playlist2 = Playlist.objects.create(
+            name="Playlist 2", description="Description 2", user_id=self.user.id
+        )
+
+    def test_user_playlist_list(self):
+        url = reverse("playlists:api:user_playlist_list", kwargs={"user_id": self.user.id})
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(len(response.data), Playlist.objects.filter(user=self.user).count())
+        for playlist in response.data:
+            self.assertEqual(playlist["user"], self.user.id)
+        expected_playlist_names = ("Playlist 2", "Playlist 1")
+        returned_playlist_names = [playlist["name"] for playlist in response.data]
+        self.assertEqual(expected_playlist_names, tuple(returned_playlist_names))
+
+
+class PlaylistCreateAPIViewTest(APITestCase):
+    def setUp(self):
+        self.user = User.objects.create_user(username='testuser', password='testpassword')
+        self.client.force_authenticate(user=self.user)
+
+    def test_create_playlist(self):
+        data = {'name': 'Test Playlist', "user": self.user.id}
+
+        response = self.client.post(reverse("playlists:playlists:playlist_create"), data, format='json')
+        print(response.content)
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+
+        # Check if the playlist was created
+        self.assertTrue(Playlist.objects.filter(name='Test Playlist', user=self.user).exists())
+
+    def test_create_playlist_unauthenticated(self):
+        self.client.logout()
+        data = {'name': 'Test Playlist'}
+
+        response = self.client.post(reverse("playlists:playlists:playlist_create"), data, format='json')
+
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+

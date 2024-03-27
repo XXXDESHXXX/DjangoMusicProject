@@ -8,11 +8,12 @@ class PlaylistSerializer(serializers.ModelSerializer):
         fields = (
             "id",
             "name",
+            "description",
+            "user",
             "image",
             "created_at",
             "updated_at",
             "is_private",
-            "description",
         )
 
 
