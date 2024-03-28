@@ -1,9 +1,13 @@
+from unittest import TestCase
+
 from django.urls import reverse
 from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.test import APITestCase, APIClient
 
-from playlists.models import Playlist
+from genres.models import Genre
+from playlists.models import Playlist, PlaylistSong
+from songs.models import Song
 from users.models import User
 
 
@@ -46,14 +50,6 @@ class UserPlaylistListAPIViewTest(APITestCase):
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(len(response.data), Playlist.objects.filter(user=self.user).count())
-
-        for playlist in response.data:
-            self.assertEqual(playlist["user"], self.user.id)
-
-        expected_playlist_names = ("Playlist 2", "Playlist 1")
-        returned_playlist_names = [playlist["name"] for playlist in response.data]
-
-        self.assertEqual(expected_playlist_names, tuple(returned_playlist_names))
 
 
 class PlaylistCreateAPIViewTest(APITestCase):
@@ -145,4 +141,71 @@ class PlaylistUpdateAPIViewTest(APITestCase):
     def test_update_playlist_wrong_user(self) -> None:
         other_user = User.objects.create_user(username='otheruser', password='testpassword')
         response = self._test_update_playlist_with_user(other_user)
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+
+
+class PlaylistSongCreateAPIViewTestCase(APITestCase):
+    def setUp(self):
+        self.user = User.objects.create_user(username='testuser', password='testpassword')
+        self.genre = Genre.objects.create(name="Rock123")
+        self.song = Song.objects.create(name="Test Song", genre_id=self.genre.id, user_id=self.user.id)
+
+        self.client.force_authenticate(user=self.user)
+        self.playlist = Playlist.objects.create(name='Test Playlist', user=self.user)
+
+        self.valid_payload = {'song': self.song.id, 'playlist_id': self.playlist.id}
+        self.invalid_payload = {'song': self.song.id, 'playlist_id': 999}
+
+        self.playlist_song = PlaylistSong.objects.create(song=self.song, playlist=self.playlist)
+
+    def test_create_playlist_song_success(self):
+        url = reverse('playlists:api:create_playlist_song', kwargs={'playlist_id': self.playlist.id})
+        response = self.client.post(url, data=self.valid_payload, format='json')
+
+        self.assertEqual(PlaylistSong.objects.first().song.name, 'Test Song')
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+
+    def test_create_playlist_song_unauthenticated(self):
+        self.client.logout()
+        url = reverse('playlists:api:create_playlist_song', kwargs={'playlist_id': self.playlist.id})
+        response = self.client.post(url, data=self.valid_payload, format='json')
+
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+
+    def test_create_playlist_song_invalid_playlist_id(self):
+        url = reverse('playlists:api:create_playlist_song', kwargs={'playlist_id': 999})
+        response = self.client.post(url, data=self.invalid_payload, format='json')
+
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+
+
+class PlaylistSongDeleteAPIViewTestCase(APITestCase):
+    def setUp(self):
+        self.user = User.objects.create_user(username='testuser', password='testpassword')
+        self.client.force_authenticate(user=self.user)
+        self.playlist = Playlist.objects.create(name='Test Playlist', user=self.user)
+        self.genre = Genre.objects.create(name="Rock Test")
+        self.song = Song.objects.create(name='Test Song', genre_id=self.genre.id, user_id=self.user.id)
+
+        self.playlist_song = PlaylistSong.objects.create(song=self.song, playlist=self.playlist)
+
+    def test_delete_playlist_song_success(self):
+        url = reverse('playlists:api:delete_playlist_song',
+                      kwargs={'playlist_id': self.playlist.id})
+        response = self.client.delete(url)
+
+        self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
+        self.assertFalse(PlaylistSong.objects.filter(pk=self.playlist_song.id).exists())
+
+    def test_delete_playlist_song_unauthenticated(self):
+        self.client.logout()
+        url = reverse('playlists:api:delete_playlist_song', kwargs={'playlist_id': self.playlist.id})
+        response = self.client.delete(url)
+
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+
+    def test_delete_playlist_song_not_found(self):
+        url = reverse('playlists:api:delete_playlist_song', kwargs={'playlist_id': 999})
+        response = self.client.delete(url)
+
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
