@@ -1,3 +1,5 @@
+from typing import Dict, Any
+
 from rest_framework import serializers
 from playlists.models import Playlist, PlaylistSong
 
@@ -21,5 +23,5 @@ class PlaylistSongSerializer(serializers.ModelSerializer):
         model = PlaylistSong
         fields = ("id", "created_at", "song")
 
-    def create(self, validated_data) -> PlaylistSong:
+    def create(self, validated_data: Dict[str, Any]) -> PlaylistSong:
         return PlaylistSong.objects.create(**validated_data)
