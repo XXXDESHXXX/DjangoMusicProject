@@ -8,7 +8,6 @@ class PlaylistSerializer(serializers.ModelSerializer):
     class Meta:
         model = Playlist
         fields = (
-            "id",
             "name",
             "description",
             "image",
@@ -21,7 +20,7 @@ class PlaylistSerializer(serializers.ModelSerializer):
 class PlaylistSongSerializer(serializers.ModelSerializer):
     class Meta:
         model = PlaylistSong
-        fields = ("id", "created_at", "song")
+        fields = ("created_at", "song")
 
     def create(self, validated_data: Dict[str, Any]) -> PlaylistSong:
         return PlaylistSong.objects.create(**validated_data)

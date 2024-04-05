@@ -1,4 +1,4 @@
-from rest_framework import status, viewsets, generics
+from rest_framework import status, generics
 from rest_framework.generics import CreateAPIView, DestroyAPIView, get_object_or_404
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
@@ -10,7 +10,6 @@ from songs.api.serializers import (
     SongSerializer,
 )
 from songs.models import UserSongLike, Song
-from users.models import UserFollow, User
 
 
 class UserSongLikeCreateAPIView(CreateAPIView):

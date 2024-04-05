@@ -27,7 +27,6 @@ class PlaylistSerializerTest(TestCase):
         self.assertEqual(
             set(data.keys()),
             {
-                "id",
                 "name",
                 "image",
                 "created_at",
