@@ -13,7 +13,9 @@ class LyricSongAPIViewTest(APITestCase):
     def setUp(self):
         self.user = User.objects.create(username="Test user")
         self.genre = Genre.objects.create(name="Test Genre")
-        self.song = Song.objects.create(name="Test Song", genre_id=self.genre.id, user_id=self.user.id)
+        self.song = Song.objects.create(
+            name="Test Song", genre_id=self.genre.id, user_id=self.user.id
+        )
         self.lyric1 = Lyric.objects.create(language="EN", song=self.song)
         self.lyric2 = Lyric.objects.create(language="RU", song=self.song)
 
@@ -30,18 +32,20 @@ class LyricDeleteAPIViewTests(APITestCase):
     def setUp(self):
         self.user = User.objects.create(username="Test user")
         self.genre = Genre.objects.create(name="Test Genre")
-        self.song = Song.objects.create(name="Test Song", genre_id=self.genre.id, user_id=self.user.id)
-        self.lyric = Lyric.objects.create(language='RU', song_id=self.song.id)
+        self.song = Song.objects.create(
+            name="Test Song", genre_id=self.genre.id, user_id=self.user.id
+        )
+        self.lyric = Lyric.objects.create(language="RU", song_id=self.song.id)
 
     def test_delete_lyric(self):
-        url = reverse('lyrics:api:delete_lyric', kwargs={'lyric_id': self.lyric.id})
+        url = reverse("lyrics:api:delete_lyric", kwargs={"lyric_id": self.lyric.id})
         self.client.force_login(self.user)
         response = self.client.delete(url)
         self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
         self.assertFalse(Lyric.objects.filter(id=self.lyric.id).exists())
 
     def test_delete_nonexistent_lyric(self):
-        url = reverse('lyrics:api:delete_lyric', kwargs={'lyric_id': 999})  # assuming 999 doesn't exist
+        url = reverse("lyrics:api:delete_lyric", kwargs={"lyric_id": 999})
         self.client.force_login(self.user)
         response = self.client.delete(url)
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)

@@ -51,9 +51,13 @@ class UserFollowDeleteAPIViewTest(APITestCase):
     def setUp(self):
         self.user_from = User.objects.create(username="user_from")
         self.user_to = User.objects.create(username="user_to")
-        self.user_follow = UserFollow.objects.create(user_from=self.user_from, user_to=self.user_to)
+        self.user_follow = UserFollow.objects.create(
+            user_from=self.user_from, user_to=self.user_to
+        )
         self.client.force_authenticate(user=self.user_from)
-        self.url = reverse("users:api:user_follow_delete", kwargs={"user_id": self.user_to.id})
+        self.url = reverse(
+            "users:api:user_follow_delete", kwargs={"user_id": self.user_to.id}
+        )
 
     def test_delete_user_follow(self):
         response = self.client.delete(self.url)
@@ -62,6 +66,8 @@ class UserFollowDeleteAPIViewTest(APITestCase):
 
     def test_delete_nonexistent_user_follow(self):
         non_existent_user_id = self.user_to.id + 1
-        url = reverse("users:api:user_follow_delete", kwargs={"user_id": non_existent_user_id})
+        url = reverse(
+            "users:api:user_follow_delete", kwargs={"user_id": non_existent_user_id}
+        )
         response = self.client.delete(url)
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)

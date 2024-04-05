@@ -45,6 +45,4 @@ class LyricDeleteAPIView(generics.DestroyAPIView):
     serializer_class = LyricSerializer
 
     def get_object(self) -> Lyric:
-        return get_object_or_404(
-            Lyric, id=self.kwargs.get("lyric_id")
-        )
+        return get_object_or_404(Lyric, id=self.kwargs.get("lyric_id"))
