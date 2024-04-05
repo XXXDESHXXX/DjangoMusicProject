@@ -4,7 +4,7 @@ from .models import Lyric, LyricLineTimecode
 
 @admin.register(Lyric)
 class LyricAdmin(admin.ModelAdmin):
-    list_display = ["language", "song"]
+    list_display = ["id", "language", "song"]
 
 
 @admin.register(LyricLineTimecode)

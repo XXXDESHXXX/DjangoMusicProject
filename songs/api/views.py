@@ -1,6 +1,7 @@
 from rest_framework import status, generics
 from rest_framework.generics import CreateAPIView, DestroyAPIView, get_object_or_404
 from rest_framework.permissions import IsAuthenticated
+from rest_framework.request import Request
 from rest_framework.response import Response
 from rest_framework.serializers import Serializer
 
@@ -21,7 +22,7 @@ class UserSongLikeCreateAPIView(CreateAPIView):
 
         serializer.save(user=user)
 
-    def create(self, request, *args, **kwargs):
+    def create(self, request: Request, *args, **kwargs) -> UserSongLike | Response:
         user = self.request.user
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
