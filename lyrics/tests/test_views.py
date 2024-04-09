@@ -28,7 +28,7 @@ class LyricSongAPIViewTest(APITestCase):
         self.assertEqual(response.data, expected_data)
 
 
-class LyricDeleteAPIViewTests(APITestCase):
+class LyricDeleteAPIViewTest(APITestCase):
     def setUp(self):
         self.user = User.objects.create(username="Test user")
         self.genre = Genre.objects.create(name="Test Genre")
@@ -49,3 +49,29 @@ class LyricDeleteAPIViewTests(APITestCase):
         self.client.force_login(self.user)
         response = self.client.delete(url)
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+
+
+class LyricCreateAPIViewTest(APITestCase):
+    def setUp(self) -> None:
+        self.genre = Genre.objects.create(name="Metal")
+        self.user = User.objects.create(username="testuser", password="testpassword")
+        self.client.force_authenticate(user=self.user)
+        self.song = Song.objects.create(
+            name="Test Song", genre_id=self.genre.id, user_id=self.user.id
+        )
+        self.valid_payload = {"language": "RU", "song_id": self.song.id}
+        self.existing_lyric = Lyric.objects.create(language="EN", song_id=self.song.id)
+        self.invalid_payload = {"language": "EN", "song_id": self.song.id}
+
+    def test_create_lyric_valid_song_id(self) -> None:
+        url = reverse("lyrics:api:create_lyric", kwargs={"song_id": self.song.id})
+        response = self.client.post(url, data=self.valid_payload, format="json")
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+
+    def test_create_lyric_duplicate_language(self):
+        url = reverse("lyrics:api:create_lyric", kwargs={"song_id": self.song.id})
+        response = self.client.post(url, data=self.invalid_payload, format="json")
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertEqual(
+            response.data["detail"], "You cannot add the same language twice"
+        )

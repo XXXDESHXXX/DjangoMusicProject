@@ -69,7 +69,6 @@ class PlaylistCreateAPIViewTest(APITestCase):
         response = self.client.post(
             reverse("playlists:playlists:playlist_create"), data, format="json"
         )
-        print(response.content)
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
 
         self.assertTrue(
