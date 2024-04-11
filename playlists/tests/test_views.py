@@ -67,7 +67,7 @@ class PlaylistCreateAPIViewTest(APITestCase):
         data = {"name": "Test Playlist", "user": self.user.id}
 
         response = self.client.post(
-            reverse("playlists:playlists:playlist_create"), data, format="json"
+            reverse("playlists:api:playlist_create"), data, format="json"
         )
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
 
@@ -80,7 +80,7 @@ class PlaylistCreateAPIViewTest(APITestCase):
         data = {"name": "Test Playlist"}
 
         response = self.client.post(
-            reverse("playlists:playlists:playlist_create"), data, format="json"
+            reverse("playlists:api:playlist_create"), data, format="json"
         )
 
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
