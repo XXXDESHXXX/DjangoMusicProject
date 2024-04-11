@@ -5,8 +5,8 @@ from rest_framework.request import Request
 from rest_framework.response import Response
 from rest_framework.serializers import Serializer
 
-from lyrics.models import Lyric
-from lyrics.api.serializers import LyricSerializer
+from lyrics.models import Lyric, LyricLineTimecode
+from lyrics.api.serializers import LyricSerializer, LyricLineTimecodeSerializer
 
 
 class LyricSongAPIView(generics.ListAPIView):
@@ -46,3 +46,11 @@ class LyricDeleteAPIView(generics.DestroyAPIView):
 
     def get_object(self) -> Lyric:
         return get_object_or_404(Lyric, id=self.kwargs.get("lyric_id"))
+
+
+class LyricLineTimecodeListAPIView(generics.ListAPIView):
+    serializer_class = LyricLineTimecodeSerializer
+
+    def get_queryset(self) -> Response:
+        lyric_id = self.kwargs.get("lyric_id")
+        return LyricLineTimecode.objects.filter(lyric_id=lyric_id)

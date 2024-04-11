@@ -1,6 +1,11 @@
 from django.urls import path
 
-from lyrics.api.views import LyricSongAPIView, LyricCreateAPIView, LyricDeleteAPIView
+from lyrics.api.views import (
+    LyricSongAPIView,
+    LyricCreateAPIView,
+    LyricDeleteAPIView,
+    LyricLineTimecodeListAPIView,
+)
 
 app_name = "lyrics"
 
@@ -15,5 +20,10 @@ urlpatterns = [
         "lyrics/delete_lyric/<int:lyric_id>",
         LyricDeleteAPIView.as_view(),
         name="delete_lyric",
+    ),
+    path(
+        "lyrics/<int:lyric_id>/lyric_line_timecodes",
+        LyricLineTimecodeListAPIView.as_view(),
+        name="lyric_line_timecode_list",
     ),
 ]
