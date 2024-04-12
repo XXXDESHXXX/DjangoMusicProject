@@ -5,6 +5,8 @@ from lyrics.api.views import (
     LyricCreateAPIView,
     LyricDeleteAPIView,
     LyricLineTimecodeListAPIView,
+    LyricLineTimecodeDeleteAPIView,
+    LyricLineTimecodeCreateAPIView,
 )
 
 app_name = "lyrics"
@@ -25,5 +27,15 @@ urlpatterns = [
         "lyrics/<int:lyric_id>/lyric_line_timecodes",
         LyricLineTimecodeListAPIView.as_view(),
         name="lyric_line_timecode_list",
+    ),
+    path(
+        "lyrics/delete_lyric_line_timecode/<int:lyric_line_timecode_id>",
+        LyricLineTimecodeDeleteAPIView.as_view(),
+        name="delete_lyric_line_timecode",
+    ),
+    path(
+        "lyrics/create_lyric_line_timecode/<int:lyric_id>",
+        LyricLineTimecodeCreateAPIView.as_view(),
+        name="create_lyric_line_timecode",
     ),
 ]

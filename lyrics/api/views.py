@@ -54,3 +54,23 @@ class LyricLineTimecodeListAPIView(generics.ListAPIView):
     def get_queryset(self) -> Response:
         lyric_id = self.kwargs.get("lyric_id")
         return LyricLineTimecode.objects.filter(lyric_id=lyric_id)
+
+
+class LyricLineTimecodeDeleteAPIView(generics.DestroyAPIView):
+    permission_classes = (IsAuthenticated,)
+    serializer_class = LyricLineTimecodeSerializer
+
+    def get_object(self) -> LyricLineTimecode:
+        return get_object_or_404(
+            LyricLineTimecode, id=self.kwargs.get("lyric_line_timecode_id")
+        )
+
+
+class LyricLineTimecodeCreateAPIView(generics.CreateAPIView):
+    permission_classes = (IsAuthenticated,)
+    serializer_class = LyricLineTimecodeSerializer
+
+    def perform_create(self, serializer: Serializer) -> None:
+        lyric_id = self.kwargs.get("lyric_id")
+
+        serializer.save(lyric_id=lyric_id)
