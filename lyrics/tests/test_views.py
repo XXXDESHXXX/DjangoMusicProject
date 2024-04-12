@@ -3,9 +3,9 @@ from rest_framework import status
 from rest_framework.test import APITestCase
 
 from genres.models import Genre
-from lyrics.models import Lyric
+from lyrics.models import Lyric, LyricLineTimecode
 from songs.models import Song
-from lyrics.api.serializers import LyricSerializer
+from lyrics.api.serializers import LyricSerializer, LyricLineTimecodeSerializer
 from users.models import User
 
 
@@ -67,7 +67,6 @@ class LyricCreateAPIViewTest(APITestCase):
         url = reverse("lyrics:api:create_lyric", kwargs={"song_id": self.song.id})
         response = self.client.post(url, data=self.valid_payload, format="json")
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
-
     def test_create_lyric_duplicate_language(self):
         url = reverse("lyrics:api:create_lyric", kwargs={"song_id": self.song.id})
         response = self.client.post(url, data=self.invalid_payload, format="json")
@@ -75,3 +74,21 @@ class LyricCreateAPIViewTest(APITestCase):
         self.assertEqual(
             response.data["detail"], "You cannot add the same language twice"
         )
+
+
+class LyricLineTimecodeListAPIViewTest(APITestCase):
+    def setUp(self):
+        self.user = User.objects.create(username="Test user")
+        self.genre = Genre.objects.create(name="Test Genre")
+        self.song = Song.objects.create(
+            name="Test Song", genre_id=self.genre.id, user_id=self.user.id
+        )
+        self.lyric = Lyric.objects.create(language="RU", song=self.song)
+        self.lyric_line1 = LyricLineTimecode.objects.create(lyric_id=self.lyric.id, timecode="00:03:03", text_line="asdhfas")
+        self.lyric_line2 = LyricLineTimecode.objects.create(lyric_id=self.lyric.id, timecode="00:04:05", text_line="asdhfasss")
+
+    def test_get_lyrics_for_song(self):
+        url = reverse("lyrics:api:lyric_line_timecode_list", kwargs={"lyric_id": self.lyric.id})
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
