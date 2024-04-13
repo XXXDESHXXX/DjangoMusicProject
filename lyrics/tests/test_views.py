@@ -67,6 +67,7 @@ class LyricCreateAPIViewTest(APITestCase):
         url = reverse("lyrics:api:create_lyric", kwargs={"song_id": self.song.id})
         response = self.client.post(url, data=self.valid_payload, format="json")
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+
     def test_create_lyric_duplicate_language(self) -> None:
         url = reverse("lyrics:api:create_lyric", kwargs={"song_id": self.song.id})
         response = self.client.post(url, data=self.invalid_payload, format="json")
@@ -84,11 +85,17 @@ class LyricLineTimecodeListAPIViewTest(APITestCase):
             name="Test Song", genre_id=self.genre.id, user_id=self.user.id
         )
         self.lyric = Lyric.objects.create(language="RU", song=self.song)
-        self.lyric_line1 = LyricLineTimecode.objects.create(lyric_id=self.lyric.id, timecode="00:03:03", text_line="asdhfas")
-        self.lyric_line2 = LyricLineTimecode.objects.create(lyric_id=self.lyric.id, timecode="00:04:05", text_line="asdhfasss")
+        self.lyric_line1 = LyricLineTimecode.objects.create(
+            lyric_id=self.lyric.id, timecode="00:03:03", text_line="asdhfas"
+        )
+        self.lyric_line2 = LyricLineTimecode.objects.create(
+            lyric_id=self.lyric.id, timecode="00:04:05", text_line="asdhfasss"
+        )
 
     def test_get_lyrics_for_song(self) -> None:
-        url = reverse("lyrics:api:lyric_line_timecode_list", kwargs={"lyric_id": self.lyric.id})
+        url = reverse(
+            "lyrics:api:lyric_line_timecode_list", kwargs={"lyric_id": self.lyric.id}
+        )
         response = self.client.get(url)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
@@ -101,24 +108,69 @@ class LyricLineTimecodeDeleteAPIViewTest(APITestCase):
             name="Test Song", genre_id=self.genre.id, user_id=self.user.id
         )
         self.lyric = Lyric.objects.create(language="RU", song=self.song)
-        self.lyric_line = LyricLineTimecode.objects.create(lyric_id=self.lyric.id, timecode="00:03:03", text_line="asdf")
+        self.lyric_line = LyricLineTimecode.objects.create(
+            lyric_id=self.lyric.id, timecode="00:03:03", text_line="asdf"
+        )
         self.client.force_authenticate(user=self.user)
 
     def test_delete_lyric_line_timecode(self) -> None:
         url = reverse(
-            "lyrics:api:delete_lyric_line_timecode", kwargs={"lyric_line_timecode_id": self.lyric_line.id}
+            "lyrics:api:delete_lyric_line_timecode",
+            kwargs={"lyric_line_timecode_id": self.lyric_line.id},
         )
 
         response = self.client.delete(url)
         self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
-        self.assertFalse(LyricLineTimecode.objects.filter(id=self.lyric_line.id).exists())
+        self.assertFalse(
+            LyricLineTimecode.objects.filter(id=self.lyric_line.id).exists()
+        )
 
     def test_delete_playlist_unauthenticated(self) -> None:
         self.client.logout()
         url = reverse(
-            "lyrics:api:delete_lyric_line_timecode", kwargs={"lyric_line_timecode_id": self.lyric_line.id}
+            "lyrics:api:delete_lyric_line_timecode",
+            kwargs={"lyric_line_timecode_id": self.lyric_line.id},
         )
 
         response = self.client.delete(url)
 
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+
+
+class LyricLineTimecodeCreateAPIView(APITestCase):
+    def setUp(self) -> None:
+        self.user = User.objects.create(username="Test USERNAME")
+        self.genre = Genre.objects.create(name="Test GENRE")
+        self.song = Song.objects.create(
+            name="Test SONG", genre_id=self.genre.id, user_id=self.user.id
+        )
+        self.lyric = Lyric.objects.create(language="RU", song=self.song)
+        self.lyric_line = LyricLineTimecode.objects.create(
+            lyric_id=self.lyric.id, timecode="00:03:03", text_line="asdf"
+        )
+        self.client.force_authenticate(user=self.user)
+
+    def test_create_lyric_line_timecode(self) -> None:
+        data = {
+            "lyric_id": self.lyric.id,
+            "timecode": "03:03:03",
+            "text_line": "text_line123456",
+        }
+
+        response = self.client.post(
+            reverse(
+                "lyrics:api:create_lyric_line_timecode",
+                kwargs={"lyric_id": self.lyric.id},
+            ),
+            data,
+            format="json",
+        )
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+
+        self.assertTrue(
+            LyricLineTimecode.objects.filter(
+                lyric_id=self.lyric.id, timecode="03:03:03", text_line="text_line123456"
+            ).exists()
+        )
+
+
