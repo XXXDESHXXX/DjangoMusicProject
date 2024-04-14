@@ -172,5 +172,3 @@ class LyricLineTimecodeCreateAPIView(APITestCase):
                 lyric_id=self.lyric.id, timecode="03:03:03", text_line="text_line123456"
             ).exists()
         )
-
-
