@@ -12,6 +12,9 @@ class Lyric(models.Model):
     def __str__(self):
         return f"lyrics for {self.song.name}"
 
+    class Meta:
+        unique_together = ("language", "song")
+
 
 class LyricLineTimecode(models.Model):
     lyric = models.ForeignKey(Lyric, on_delete=models.CASCADE)
