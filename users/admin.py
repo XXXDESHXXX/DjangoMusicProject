@@ -4,7 +4,7 @@ from .models import User, UserFollow
 
 @admin.register(UserFollow)
 class UserFollowAdmin(admin.ModelAdmin):
-    list_display = ("user_from", "user_to", "created")
+    list_display = ("id", "user_from", "user_to", "created")
     list_filter = ("created",)
 
 

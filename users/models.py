@@ -16,6 +16,7 @@ class UserFollow(models.Model):
             models.Index(fields=["-created"]),
         ]
         ordering = ["-created"]
+        unique_together = ("user_from", "user_to")
 
     def __str__(self):
         return f"User{self.user_from} subscribed {self.user_to}"
