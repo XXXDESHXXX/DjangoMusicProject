@@ -26,19 +26,6 @@ class LyricCreateAPIView(generics.CreateAPIView):
 
         serializer.save(song_id=song_id)
 
-    def create(self, request: Request, *args, **kwargs) -> Lyric | Response:
-        song_id = self.kwargs.get("song_id")
-        serializer = self.get_serializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
-        if Lyric.objects.filter(
-            song_id=song_id, language=serializer.validated_data["language"]
-        ):
-            return Response(
-                {"detail": "You cannot add the same language twice"},
-                status=status.HTTP_400_BAD_REQUEST,
-            )
-        return super().create(request, *args, **kwargs)
-
 
 class LyricDeleteAPIView(generics.DestroyAPIView):
     permission_classes = (IsAuthenticated,)
