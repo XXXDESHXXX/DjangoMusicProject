@@ -1,4 +1,5 @@
 from rest_framework import generics, status
+from rest_framework.exceptions import PermissionDenied
 from rest_framework.generics import get_object_or_404
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.request import Request
@@ -33,6 +34,16 @@ class LyricDeleteAPIView(generics.DestroyAPIView):
 
     def get_object(self) -> Lyric:
         return get_object_or_404(Lyric, id=self.kwargs.get("lyric_id"))
+
+    def destroy(self, request: Request, *args: tuple, **kwargs: dict) -> Response:
+        instance = self.get_object()
+        song = instance.song
+
+        if song.user != request.user:
+            raise PermissionDenied("You cannot delete this lyric")
+
+        self.perform_destroy(instance)
+        return Response(status=status.HTTP_204_NO_CONTENT)
 
 
 class LyricLineTimecodeListAPIView(generics.ListAPIView):
