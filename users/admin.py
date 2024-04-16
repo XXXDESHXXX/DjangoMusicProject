@@ -12,3 +12,4 @@ class UserFollowAdmin(admin.ModelAdmin):
 class UserAdmin(admin.ModelAdmin):
     list_display = ("id", "username", "role", "image", "is_private")
     list_filter = ("is_private", "role")
+    exclude = ("listens",)

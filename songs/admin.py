@@ -11,3 +11,4 @@ class UserSongLikeAdmin(admin.ModelAdmin):
 @admin.register(Song)
 class SongAdmin(admin.ModelAdmin):
     list_display = ("id", "name", "genre", "user")
+    exclude = ("likes",)
