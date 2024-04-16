@@ -8,6 +8,7 @@ from rest_framework.serializers import Serializer
 
 from lyrics.models import Lyric, LyricLineTimecode
 from lyrics.api.serializers import LyricSerializer, LyricLineTimecodeSerializer
+from songs.models import Song
 
 
 class LyricSongAPIView(generics.ListAPIView):
@@ -24,6 +25,11 @@ class LyricCreateAPIView(generics.CreateAPIView):
 
     def perform_create(self, serializer: Serializer) -> None:
         song_id = self.kwargs.get("song_id")
+
+        song = Song.objects.get(id=song_id)
+
+        if song.user != self.request.user:
+            raise PermissionDenied("You cannot add lyric for this song")
 
         serializer.save(song_id=song_id)
 
@@ -63,6 +69,17 @@ class LyricLineTimecodeDeleteAPIView(generics.DestroyAPIView):
             LyricLineTimecode, id=self.kwargs.get("lyric_line_timecode_id")
         )
 
+    def destroy(self, request: Request, *args: tuple, **kwargs: dict) -> Response:
+        instance = self.get_object()
+
+        lyric = instance.lyric
+
+        if lyric.song.user != request.user:
+            raise PermissionDenied("You cannot delete this timecode")
+
+        self.perform_destroy(instance)
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
 
 class LyricLineTimecodeCreateAPIView(generics.CreateAPIView):
     permission_classes = (IsAuthenticated,)
@@ -70,5 +87,10 @@ class LyricLineTimecodeCreateAPIView(generics.CreateAPIView):
 
     def perform_create(self, serializer: Serializer) -> None:
         lyric_id = self.kwargs.get("lyric_id")
+
+        lyric = Lyric.objects.get(id=lyric_id)
+
+        if lyric.song.user != self.request.user:
+            raise PermissionDenied("You cannot add timecode for this lyric")
 
         serializer.save(lyric_id=lyric_id)
