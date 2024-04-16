@@ -37,7 +37,9 @@ class User(AbstractUser):
         "self",
         through=UserFollow,
     )
-    listens = models.ManyToManyField("songs.Song", related_name="user_who_listen")
+    listens = models.ManyToManyField(
+        "songs.Song", related_name="user_who_listen", blank=True
+    )
 
     def __str__(self):
         return f"{self.username} {self.role}"
