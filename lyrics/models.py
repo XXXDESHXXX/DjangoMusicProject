@@ -21,5 +21,8 @@ class LyricLineTimecode(models.Model):
     timecode = models.DurationField()
     text_line = models.CharField(max_length=128)
 
+    class Meta:
+        unique_together = ("timecode", "text_line")
+
     def __str__(self):
         return self.text_line
