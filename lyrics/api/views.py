@@ -8,6 +8,7 @@ from rest_framework.serializers import Serializer
 
 from lyrics.models import Lyric, LyricLineTimecode
 from lyrics.api.serializers import LyricSerializer, LyricLineTimecodeSerializer
+from lyrics.paginators import LyricLineTimecodePageLimitOffsetPagination
 from songs.models import Song
 
 
@@ -54,6 +55,7 @@ class LyricDeleteAPIView(generics.DestroyAPIView):
 
 class LyricLineTimecodeListAPIView(generics.ListAPIView):
     serializer_class = LyricLineTimecodeSerializer
+    pagination_class = LyricLineTimecodePageLimitOffsetPagination
 
     def get_queryset(self) -> Response:
         lyric_id = self.kwargs.get("lyric_id")
