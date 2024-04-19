@@ -18,7 +18,7 @@ class Lyric(models.Model):
 
 class LyricLineTimecode(models.Model):
     lyric = models.ForeignKey(Lyric, on_delete=models.CASCADE)
-    timecode = models.DurationField()
+    timecode = models.IntegerField()
     text_line = models.CharField(max_length=128)
 
     class Meta:
