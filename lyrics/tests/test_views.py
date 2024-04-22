@@ -52,7 +52,7 @@ class LyricDeleteAPIViewTest(APITestCase):
         response = self.client.delete(url)
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
 
-    def test_delete_lyric_without_permission(self) -> None:
+    def test_delete_lyric_by_another_user(self) -> None:
         other_user = User.objects.create_user(username="otheruser", password="testpassword")
         self.client.force_login(user=other_user)
 
@@ -89,10 +89,10 @@ class LyricLineTimecodeListAPIViewTest(APITestCase):
         )
         self.lyric = Lyric.objects.create(language="RU", song=self.song)
         self.lyric_line1 = LyricLineTimecode.objects.create(
-            lyric_id=self.lyric.id, timecode="00:03:03", text_line="asdhfas"
+            lyric_id=self.lyric.id, timecode=12, text_line="asdhfas"
         )
         self.lyric_line2 = LyricLineTimecode.objects.create(
-            lyric_id=self.lyric.id, timecode="00:04:05", text_line="asdhfasss"
+            lyric_id=self.lyric.id, timecode=123, text_line="asdhfasss"
         )
 
     def test_get_lyrics_for_song(self) -> None:
@@ -112,7 +112,7 @@ class LyricLineTimecodeDeleteAPIViewTest(APITestCase):
         )
         self.lyric = Lyric.objects.create(language="RU", song=self.song)
         self.lyric_line = LyricLineTimecode.objects.create(
-            lyric_id=self.lyric.id, timecode="00:03:03", text_line="asdf"
+            lyric_id=self.lyric.id, timecode=13, text_line="asdf"
         )
         self.client.force_authenticate(user=self.user)
 
@@ -128,7 +128,7 @@ class LyricLineTimecodeDeleteAPIViewTest(APITestCase):
             LyricLineTimecode.objects.filter(id=self.lyric_line.id).exists()
         )
 
-    def test_delete_playlist_unauthenticated(self) -> None:
+    def test_delete_unauthenticated(self) -> None:
         self.client.logout()
         url = reverse(
             "lyrics:api:delete_lyric_line_timecode",
@@ -138,6 +138,16 @@ class LyricLineTimecodeDeleteAPIViewTest(APITestCase):
         response = self.client.delete(url)
 
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+
+    def test_delete_by_another_user(self) -> None:
+        other_user = User.objects.create_user(username="otheruser1", password="testpassword")
+        self.client.force_authenticate(user=other_user)
+
+        url = reverse("lyrics:api:delete_lyric_line_timecode", kwargs={"lyric_line_timecode_id": self.lyric_line.id})
+        response = self.client.delete(url)
+
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+        self.assertTrue(LyricLineTimecode.objects.filter(pk=self.lyric_line.id).exists())
 
 
 class LyricLineTimecodeCreateAPIView(APITestCase):
