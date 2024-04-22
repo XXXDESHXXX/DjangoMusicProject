@@ -26,7 +26,7 @@ class LyricSerializerTestCase(TestCase):
 
     def test_serializer_contains_expected_fields(self) -> None:
         data = self.serializer.data
-        self.assertEqual(set(data.keys()), {"language", "song_id"})
+        self.assertEqual(set(data.keys()), {"id", "language", "song_id"})
 
     def test_serializer_fields_content(self) -> None:
         data = self.serializer.data
@@ -58,6 +58,7 @@ class LyricLineTimecodeSerializerTest(TestCase):
     def test_serializer_data(self) -> None:
         serializer = LyricLineTimecodeSerializer(instance=self.lyric_line_timecode)
         expected_data = {
+            "id": 1,
             "timecode": 1,
             "text_line": self.lyric_line_timecode.text_line,
         }

@@ -159,14 +159,14 @@ class LyricLineTimecodeCreateAPIView(APITestCase):
         )
         self.lyric = Lyric.objects.create(language="RU", song=self.song)
         self.lyric_line = LyricLineTimecode.objects.create(
-            lyric_id=self.lyric.id, timecode="00:03:03", text_line="asdf"
+            lyric_id=self.lyric.id, timecode=1, text_line="asdf"
         )
         self.client.force_authenticate(user=self.user)
 
     def test_create_lyric_line_timecode(self) -> None:
         data = {
             "lyric_id": self.lyric.id,
-            "timecode": "03:03:03",
+            "timecode": 2,
             "text_line": "text_line123456",
         }
 
@@ -182,6 +182,33 @@ class LyricLineTimecodeCreateAPIView(APITestCase):
 
         self.assertTrue(
             LyricLineTimecode.objects.filter(
-                lyric_id=self.lyric.id, timecode="03:03:03", text_line="text_line123456"
+                lyric_id=self.lyric.id, timecode=2, text_line="text_line123456"
+            ).exists()
+        )
+
+    def test_create_by_another_user(self) -> None:
+        other_user = User.objects.create(username="Other user")
+        self.client.force_authenticate(user=other_user)
+
+        data = {
+            "lyric_id": self.lyric.id,
+            "timecode": 2,
+            "text_line": "text_line123456",
+        }
+
+        response = self.client.post(
+            reverse(
+                "lyrics:api:create_lyric_line_timecode",
+                kwargs={"lyric_id": self.lyric.id},
+            ),
+            data,
+            format="json",
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+
+        self.assertFalse(
+            LyricLineTimecode.objects.filter(
+                lyric_id=self.lyric.id, timecode=2, text_line="text_line123456"
             ).exists()
         )
