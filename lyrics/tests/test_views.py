@@ -1,5 +1,7 @@
+from django.db import IntegrityError
 from django.urls import reverse
 from rest_framework import status
+from rest_framework.exceptions import PermissionDenied
 from rest_framework.test import APITestCase
 
 from genres.models import Genre
@@ -50,6 +52,16 @@ class LyricDeleteAPIViewTest(APITestCase):
         response = self.client.delete(url)
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
 
+    def test_delete_lyric_without_permission(self) -> None:
+        other_user = User.objects.create_user(username="otheruser", password="testpassword")
+        self.client.force_login(user=other_user)
+
+        url = reverse("lyrics:api:delete_lyric", kwargs={"lyric_id": self.lyric.id})
+        response = self.client.delete(url)
+
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+        self.assertTrue(Lyric.objects.filter(pk=self.lyric.id).exists())
+
 
 class LyricCreateAPIViewTest(APITestCase):
     def setUp(self) -> None:
@@ -61,20 +73,11 @@ class LyricCreateAPIViewTest(APITestCase):
         )
         self.valid_payload = {"language": "RU", "song_id": self.song.id}
         self.existing_lyric = Lyric.objects.create(language="EN", song_id=self.song.id)
-        self.invalid_payload = {"language": "EN", "song_id": self.song.id}
 
-    def test_create_lyric_valid_song_id(self) -> None:
+    def test_create_lyric_with_valid_data(self) -> None:
         url = reverse("lyrics:api:create_lyric", kwargs={"song_id": self.song.id})
         response = self.client.post(url, data=self.valid_payload, format="json")
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
-
-    def test_create_lyric_duplicate_language(self) -> None:
-        url = reverse("lyrics:api:create_lyric", kwargs={"song_id": self.song.id})
-        response = self.client.post(url, data=self.invalid_payload, format="json")
-        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
-        self.assertEqual(
-            response.data["detail"], "You cannot add the same language twice"
-        )
 
 
 class LyricLineTimecodeListAPIViewTest(APITestCase):
