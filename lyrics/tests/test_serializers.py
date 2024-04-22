@@ -92,6 +92,7 @@ class LyricLineTimecodeValidSerializerTest(TestCase):
 
     def test_create_negative_timecode(self) -> None:
         invalid_data = {"timecode": -1, "text_line": "123456"}
+
         serializer_with_invalid_data = LyricLineTimecodeValidSerializer(data=invalid_data)
         self.assertFalse(serializer_with_invalid_data.is_valid())
 
@@ -99,5 +100,6 @@ class LyricLineTimecodeValidSerializerTest(TestCase):
             "timecode": 12,
             "text_line": "New text line",
         }
+
         serializer_with_valid_data = LyricLineTimecodeValidSerializer(data=valid_data)
         self.assertTrue(serializer_with_valid_data.is_valid())
