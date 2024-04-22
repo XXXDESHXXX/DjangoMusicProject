@@ -1,5 +1,5 @@
 from rest_framework import generics, status
-from rest_framework.exceptions import PermissionDenied
+from rest_framework.exceptions import PermissionDenied, ValidationError
 from rest_framework.generics import get_object_or_404
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.request import Request
@@ -7,7 +7,11 @@ from rest_framework.response import Response
 from rest_framework.serializers import Serializer
 
 from lyrics.models import Lyric, LyricLineTimecode
-from lyrics.api.serializers import LyricSerializer, LyricLineTimecodeSerializer
+from lyrics.api.serializers import (
+    LyricSerializer,
+    LyricLineTimecodeSerializer,
+    LyricLineTimecodeValidSerializer,
+)
 from lyrics.paginators import LyricLineTimecodePageLimitOffsetPagination
 from songs.models import Song
 
@@ -85,14 +89,20 @@ class LyricLineTimecodeDeleteAPIView(generics.DestroyAPIView):
 
 class LyricLineTimecodeCreateAPIView(generics.CreateAPIView):
     permission_classes = (IsAuthenticated,)
-    serializer_class = LyricLineTimecodeSerializer
+    serializer_class = LyricLineTimecodeValidSerializer
 
     def perform_create(self, serializer: Serializer) -> None:
         lyric_id = self.kwargs.get("lyric_id")
+
+        serializer = self.get_serializer(data=self.request.data)
+
+        serializer.is_valid(raise_exception=True)
 
         lyric = Lyric.objects.get(id=lyric_id)
 
         if lyric.song.user != self.request.user:
             raise PermissionDenied("You cannot add timecode for this lyric")
 
-        serializer.save(lyric_id=lyric_id)
+        serializer.save(
+            lyric_id=lyric_id,
+        )
