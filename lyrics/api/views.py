@@ -7,11 +7,7 @@ from rest_framework.response import Response
 from rest_framework.serializers import Serializer
 
 from lyrics.models import Lyric, LyricLineTimecode
-from lyrics.api.serializers import (
-    LyricSerializer,
-    LyricLineTimecodeSerializer,
-    LyricLineTimecodeValidSerializer,
-)
+from lyrics.api.serializers import LyricSerializer, LyricLineTimecodeSerializer
 from lyrics.paginators import LyricLineTimecodePageLimitOffsetPagination
 from songs.models import Song
 
@@ -89,7 +85,7 @@ class LyricLineTimecodeDeleteAPIView(generics.DestroyAPIView):
 
 class LyricLineTimecodeCreateAPIView(generics.CreateAPIView):
     permission_classes = (IsAuthenticated,)
-    serializer_class = LyricLineTimecodeValidSerializer
+    serializer_class = LyricLineTimecodeSerializer
 
     def perform_create(self, serializer: Serializer) -> None:
         lyric_id = self.kwargs.get("lyric_id")

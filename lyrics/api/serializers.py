@@ -13,8 +13,6 @@ class LyricLineTimecodeSerializer(serializers.ModelSerializer):
         model = LyricLineTimecode
         fields = ("id", "timecode", "text_line")
 
-
-class LyricLineTimecodeValidSerializer(LyricLineTimecodeSerializer):
     def validate_timecode(self, value):
         if value < 0:
             raise serializers.ValidationError(
