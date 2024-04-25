@@ -1,8 +1,9 @@
 from django.db.models import QuerySet
-from rest_framework import generics
+from rest_framework import generics, status
 from rest_framework.exceptions import PermissionDenied
 from rest_framework.generics import get_object_or_404
 from rest_framework.permissions import IsAuthenticated
+from rest_framework.request import Request
 from rest_framework.response import Response
 from rest_framework.serializers import Serializer
 
@@ -27,7 +28,6 @@ class UserPlaylistListAPIView(generics.ListAPIView):
 class PlaylistCreateAPIView(generics.CreateAPIView):
     permission_classes = (IsAuthenticated,)
     serializer_class = PlaylistSerializer
-    queryset = Playlist.objects.all()
 
     def perform_create(self, serializer: Serializer) -> None:
         serializer.save(user=self.request.user)
