@@ -13,6 +13,7 @@ from songs.models import Song
 
 
 class LyricSongAPIView(generics.ListAPIView):
+    permission_classes = (IsAuthenticated,)
     serializer_class = LyricSerializer
 
     def get_queryset(self) -> Response:
@@ -30,7 +31,7 @@ class LyricCreateAPIView(generics.CreateAPIView):
         song = Song.objects.get(id=song_id)
 
         if song.user != self.request.user:
-            raise PermissionDenied("You cannot add lyric for this song")
+            raise PermissionDenied("You do not have sufficient rights for this action")
 
         serializer.save(song_id=song_id)
 
@@ -47,7 +48,7 @@ class LyricDeleteAPIView(generics.DestroyAPIView):
         song = instance.song
 
         if song.user != request.user:
-            raise PermissionDenied("You cannot delete this lyric")
+            raise PermissionDenied("You do not have sufficient rights for this action")
 
         self.perform_destroy(instance)
         return Response(status=status.HTTP_204_NO_CONTENT)
@@ -77,7 +78,7 @@ class LyricLineTimecodeDeleteAPIView(generics.DestroyAPIView):
         lyric = instance.lyric
 
         if lyric.song.user != request.user:
-            raise PermissionDenied("You cannot delete this timecode")
+            raise PermissionDenied("You do not have sufficient rights for this action")
 
         self.perform_destroy(instance)
         return Response(status=status.HTTP_204_NO_CONTENT)
@@ -97,7 +98,7 @@ class LyricLineTimecodeCreateAPIView(generics.CreateAPIView):
         lyric = Lyric.objects.get(id=lyric_id)
 
         if lyric.song.user != self.request.user:
-            raise PermissionDenied("You cannot add timecode for this lyric")
+            raise PermissionDenied("You do not have sufficient rights for this action")
 
         serializer.save(
             lyric_id=lyric_id,
