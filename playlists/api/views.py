@@ -1,4 +1,6 @@
+from django.db.models import QuerySet
 from rest_framework import generics
+from rest_framework.exceptions import PermissionDenied
 from rest_framework.generics import get_object_or_404
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
@@ -6,18 +8,19 @@ from rest_framework.serializers import Serializer
 
 from playlists.models import Playlist, PlaylistSong
 from .serializers import PlaylistSerializer, PlaylistSongSerializer
-
-
-class PlaylistListAPIView(generics.ListAPIView):
-    serializer_class = PlaylistSerializer
-    queryset = Playlist.objects.all()
+from ..paginators import UserPlaylistPageLimitOffsetPagination
 
 
 class UserPlaylistListAPIView(generics.ListAPIView):
     serializer_class = PlaylistSerializer
+    pagination_class = UserPlaylistPageLimitOffsetPagination
+    permission_classes = (IsAuthenticated,)
 
-    def get_queryset(self) -> Response:
+    def get_queryset(self) -> QuerySet:
         user_id = self.kwargs.get("user_id")
+
+        if self.request.user.id != user_id:
+            return Playlist.objects.filter(is_private=False, user_id=user_id)
         return Playlist.objects.filter(user_id=user_id)
 
 
