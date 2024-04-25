@@ -1,7 +1,6 @@
 from django.urls import path
 
 from playlists.api.views import (
-    PlaylistListAPIView,
     UserPlaylistListAPIView,
     PlaylistCreateAPIView,
     PlaylistDeleteAPIView,
@@ -13,7 +12,6 @@ from playlists.api.views import (
 app_name = "playlists"
 
 urlpatterns = [
-    path("playlists/", PlaylistListAPIView.as_view(), name="list_of_playlists"),
     path(
         "user/<int:user_id>/playlists/",
         UserPlaylistListAPIView.as_view(),

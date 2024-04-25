@@ -15,6 +15,7 @@ class PlaylistAdmin(admin.ModelAdmin):
     )
     list_filter = ("created_at", "updated_at", "is_private")
     search_fields = ("name", "description")
+    exclude = ("songs",)
 
 
 @admin.register(PlaylistSong)
