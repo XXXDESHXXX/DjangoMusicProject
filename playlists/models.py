@@ -6,6 +6,7 @@ from users.models import User
 
 class PlaylistSong(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
+    playlist = models.ForeignKey("playlists.Playlist", related_name="playlist_songs", on_delete=models.CASCADE)
     song = models.ForeignKey(Song, on_delete=models.CASCADE)
 
     def __str__(self):
@@ -20,7 +21,7 @@ class Playlist(models.Model):
     is_private = models.BooleanField(default=False)
     description = models.CharField(blank=True, null=True, max_length=255)
     user = models.ForeignKey(User, related_name="playlists", on_delete=models.PROTECT)
-    songs = models.ManyToManyField(PlaylistSong)
+    songs = models.ManyToManyField(PlaylistSong, related_name="playlist_songs")
 
     class Meta:
         ordering = ["-created_at"]

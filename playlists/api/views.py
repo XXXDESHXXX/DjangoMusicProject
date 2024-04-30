@@ -59,6 +59,9 @@ class PlaylistSongCreateAPIView(generics.CreateAPIView):
 
     def perform_create(self, serializer: Serializer) -> None:
         playlist = get_object_or_404(Playlist, id=self.kwargs.get("playlist_id"))
+        if playlist.user != self.request.user:
+            raise PermissionDenied("You do not have permission for this action.")
+
         serializer.save(playlist=playlist)
 
 
@@ -67,4 +70,9 @@ class PlaylistSongDeleteAPIView(generics.DestroyAPIView):
     serializer_class = PlaylistSongSerializer
 
     def get_object(self) -> PlaylistSong:
-        return get_object_or_404(PlaylistSong, id=self.kwargs.get("playlist_id"))
+        playlist_song = get_object_or_404(PlaylistSong, id=self.kwargs.get("playlist_song_id"))
+
+        if playlist_song.playlist.user != self.request.user:
+            raise PermissionDenied("You do not have permission for this action.")
+
+        return playlist_song

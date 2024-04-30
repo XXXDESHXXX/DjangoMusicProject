@@ -34,7 +34,7 @@ urlpatterns = [
         name="create_playlist_song",
     ),
     path(
-        "playlists/delete_playlist_song/<int:playlist_id>",
+        "playlists/delete_playlist_song/<int:playlist_song_id>",
         PlaylistSongDeleteAPIView.as_view(),
         name="delete_playlist_song",
     ),
