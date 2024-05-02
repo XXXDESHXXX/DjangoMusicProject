@@ -220,6 +220,15 @@ class PlaylistSongCreateAPIViewTestCase(APITestCase):
 
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
 
+    def test_create_playlist_song_permission_denied(self) -> None:
+        other_user = User.objects.create_user(username="otheruser", password="testpassword")
+        other_playlist = Playlist.objects.create(name="Other Playlist", user=other_user)
+
+        url = reverse("playlists:api:create_playlist_song", kwargs={"playlist_id": other_playlist.id})
+        response = self.client.post(url, data=self.valid_payload, format="json")
+
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+
 
 class PlaylistSongDeleteAPIViewTestCase(APITestCase):
     def setUp(self) -> None:
