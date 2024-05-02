@@ -20,5 +20,5 @@ class PlaylistAdmin(admin.ModelAdmin):
 
 @admin.register(PlaylistSong)
 class PlaylistSongAdmin(admin.ModelAdmin):
-    list_display = ("id", "created_at", "song")
+    list_display = ("id", "song", "playlist", "created_at")
     list_filter = ("created_at",)
