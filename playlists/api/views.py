@@ -13,9 +13,9 @@ from ..paginators import UserPlaylistPageLimitOffsetPagination
 
 
 class UserPlaylistListAPIView(generics.ListAPIView):
+    permission_classes = (IsAuthenticated,)
     serializer_class = PlaylistSerializer
     pagination_class = UserPlaylistPageLimitOffsetPagination
-    permission_classes = (IsAuthenticated,)
 
     def get_queryset(self) -> QuerySet:
         user_id = self.kwargs.get("user_id")
