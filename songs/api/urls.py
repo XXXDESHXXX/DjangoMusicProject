@@ -16,7 +16,7 @@ urlpatterns = [
         name="user_like_create",
     ),
     path(
-        "songs/likes/delete/<int:song_id>/",
+        "songs/likes/delete/<int:song_id>",
         UserSongLikeDeleteAPIView.as_view(),
         name="user_like_delete",
     ),

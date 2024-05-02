@@ -22,19 +22,6 @@ class UserSongLikeCreateAPIView(CreateAPIView):
 
         serializer.save(user=user)
 
-    def create(self, request: Request, *args, **kwargs) -> UserSongLike | Response:
-        user = self.request.user
-        serializer = self.get_serializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
-        if UserSongLike.objects.filter(
-            user=user, liked_song=serializer.validated_data["liked_song"]
-        ):
-            return Response(
-                {"detail": "You cannot like the same song twice"},
-                status=status.HTTP_400_BAD_REQUEST,
-            )
-        return super().create(request, *args, **kwargs)
-
 
 class UserSongLikeDeleteAPIView(DestroyAPIView):
     permission_classes = (IsAuthenticated,)

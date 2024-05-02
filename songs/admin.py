@@ -4,7 +4,7 @@ from .models import Song, UserSongLike
 
 @admin.register(UserSongLike)
 class UserSongLikeAdmin(admin.ModelAdmin):
-    list_display = ("user",)
+    list_display = ("id", "user", "liked_song")
     list_filter = ("created_at",)
 
 

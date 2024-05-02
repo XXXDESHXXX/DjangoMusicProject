@@ -9,6 +9,9 @@ class UserSongLike(models.Model):
     liked_song = models.ForeignKey("songs.Song", on_delete=models.CASCADE)
     created_at = models.DateTimeField(auto_now_add=True)
 
+    class Meta:
+        unique_together = ("user", "liked_song")
+
 
 class Song(models.Model):
     file = models.FileField()
