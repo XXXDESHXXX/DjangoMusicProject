@@ -11,6 +11,15 @@ from songs.api.serializers import (
     SongSerializer,
 )
 from songs.models import UserSongLike, Song
+from utils.permissions import IsMusician
+
+
+class SongCreateAPIView(CreateAPIView):
+    permission_classes = (IsAuthenticated, IsMusician)
+    serializer_class = SongSerializer
+
+    def perform_create(self, serializer):
+        serializer.save(user=self.request.user)
 
 
 class UserSongLikeCreateAPIView(CreateAPIView):
@@ -35,5 +44,5 @@ class UserSongLikeDeleteAPIView(DestroyAPIView):
 
 
 class SongListAPIView(generics.ListAPIView):
-    serializer_class = SongSerializer
     queryset = Song.objects.all()
+    serializer_class = SongSerializer
