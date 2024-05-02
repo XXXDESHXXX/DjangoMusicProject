@@ -48,5 +48,5 @@ class UserSongLikeDeleteAPIView(DestroyAPIView):
 
 
 class SongListAPIView(generics.ListAPIView):
-    permission_classes = (IsAuthenticated,)
     serializer_class = SongSerializer
+    queryset = Song.objects.all()

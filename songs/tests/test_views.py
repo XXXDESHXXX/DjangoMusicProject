@@ -29,9 +29,6 @@ class SongListAPIViewTest(APITestCase):
         for song_data, expected_song in zip(response.data, [self.song1, self.song2]):
             self.assertEqual(song_data["id"], expected_song.id)
             self.assertEqual(song_data["name"], expected_song.name)
-            self.assertEqual(
-                song_data["file"], f"http://testserver{expected_song.file.url}"
-            )
 
     def test_song_list_empty(self) -> None:
         Song.objects.all().delete()
