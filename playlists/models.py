@@ -6,7 +6,9 @@ from users.models import User
 
 class PlaylistSong(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
-    playlist = models.ForeignKey("playlists.Playlist", related_name="playlist_songs", on_delete=models.CASCADE)
+    playlist = models.ForeignKey(
+        "playlists.Playlist", related_name="playlist_songs", on_delete=models.CASCADE
+    )
     song = models.ForeignKey(Song, on_delete=models.CASCADE)
 
     def __str__(self):

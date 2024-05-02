@@ -14,7 +14,9 @@ from users.models import User
 class UserPlaylistListAPIViewTest(APITestCase):
     def setUp(self) -> None:
         self.user = User.objects.create(username="test_user")
+        self.other_user = User.objects.create(username="other_user")
         self.client = APIClient()
+        self.client.force_authenticate(user=self.user)
         self.playlist1 = Playlist.objects.create(
             name="Playlist 1", description="Description 1", user_id=self.user.id
         )
@@ -29,8 +31,29 @@ class UserPlaylistListAPIViewTest(APITestCase):
         response = self.client.get(url)
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+    def test_user_playlist_list_authenticated_same_user(self) -> None:
+        url = reverse(
+            "playlists:api:user_playlist_list", kwargs={"user_id": self.user.id}
+        )
+        response = self.client.get(url)
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(
-            len(response.data), Playlist.objects.filter(user=self.user).count()
+            len(response.data["results"]),
+            Playlist.objects.filter(user=self.user).count(),
+        )
+
+    def test_user_playlist_list_authenticated_different_user(self) -> None:
+        url = reverse(
+            "playlists:api:user_playlist_list", kwargs={"user_id": self.other_user.id}
+        )
+        response = self.client.get(url)
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(
+            len(response.data["results"]),
+            Playlist.objects.filter(user=self.other_user, is_private=False).count(),
         )
 
 

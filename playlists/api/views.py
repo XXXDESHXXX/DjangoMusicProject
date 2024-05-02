@@ -70,7 +70,9 @@ class PlaylistSongDeleteAPIView(generics.DestroyAPIView):
     serializer_class = PlaylistSongSerializer
 
     def get_object(self) -> PlaylistSong:
-        playlist_song = get_object_or_404(PlaylistSong, id=self.kwargs.get("playlist_song_id"))
+        playlist_song = get_object_or_404(
+            PlaylistSong, id=self.kwargs.get("playlist_song_id")
+        )
 
         if playlist_song.playlist.user != self.request.user:
             raise PermissionDenied("You do not have permission for this action.")
