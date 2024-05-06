@@ -1,8 +1,6 @@
-from rest_framework import status, generics
+from rest_framework import generics
 from rest_framework.generics import CreateAPIView, DestroyAPIView, get_object_or_404
 from rest_framework.permissions import IsAuthenticated
-from rest_framework.request import Request
-from rest_framework.response import Response
 from rest_framework.serializers import Serializer
 
 from songs.api.serializers import (
