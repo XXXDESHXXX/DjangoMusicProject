@@ -13,7 +13,6 @@ from ..paginators import UserPlaylistPageLimitOffsetPagination
 
 
 class UserPlaylistListAPIView(generics.ListAPIView):
-    permission_classes = (IsAuthenticated,)
     serializer_class = PlaylistSerializer
     pagination_class = UserPlaylistPageLimitOffsetPagination
 
