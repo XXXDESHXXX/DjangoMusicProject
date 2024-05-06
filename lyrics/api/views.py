@@ -13,7 +13,6 @@ from songs.models import Song
 
 
 class LyricSongAPIView(generics.ListAPIView):
-    permission_classes = (IsAuthenticated,)
     serializer_class = LyricSerializer
 
     def get_queryset(self) -> Response:
