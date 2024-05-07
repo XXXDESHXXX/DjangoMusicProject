@@ -1,5 +1,6 @@
+from django.db.models import QuerySet
 from rest_framework import generics, status
-from rest_framework.exceptions import PermissionDenied, ValidationError
+from rest_framework.exceptions import PermissionDenied
 from rest_framework.generics import get_object_or_404
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.request import Request
@@ -16,7 +17,7 @@ from utils.permissions import IsMusician
 class LyricSongAPIView(generics.ListAPIView):
     serializer_class = LyricSerializer
 
-    def get_queryset(self) -> Response:
+    def get_queryset(self) -> QuerySet:
         song_id = self.kwargs.get("song_id")
         return Lyric.objects.filter(song_id=song_id)
 
@@ -58,7 +59,7 @@ class LyricLineTimecodeListAPIView(generics.ListAPIView):
     serializer_class = LyricLineTimecodeSerializer
     pagination_class = LyricLineTimecodePageLimitOffsetPagination
 
-    def get_queryset(self) -> Response:
+    def get_queryset(self) -> QuerySet:
         lyric_id = self.kwargs.get("lyric_id")
         return LyricLineTimecode.objects.filter(lyric_id=lyric_id)
 
