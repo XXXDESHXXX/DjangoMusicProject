@@ -18,8 +18,19 @@ class SongCreateAPIView(CreateAPIView):
     permission_classes = (IsAuthenticated, IsMusician)
     serializer_class = SongSerializer
 
-    def perform_create(self, serializer):
+    def perform_create(self, serializer: Serializer) -> None:
         serializer.save(user=self.request.user)
+
+
+class SongDeleteAPIView(DestroyAPIView):
+    permission_classes = (IsAuthenticated, IsMusician)
+    serializer_class = SongSerializer
+
+    def get_object(self) -> Song:
+        song_id = self.kwargs.get("song_id")
+        user = self.request.user
+        song = get_object_or_404(Song, id=song_id)
+        return get_object_or_404(Song, song=song, user=user)
 
 
 class UserSongLikeCreateAPIView(CreateAPIView):

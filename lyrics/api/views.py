@@ -10,6 +10,7 @@ from lyrics.models import Lyric, LyricLineTimecode
 from lyrics.api.serializers import LyricSerializer, LyricLineTimecodeSerializer
 from lyrics.paginators import LyricLineTimecodePageLimitOffsetPagination
 from songs.models import Song
+from utils.permissions import IsMusician
 
 
 class LyricSongAPIView(generics.ListAPIView):
@@ -21,7 +22,7 @@ class LyricSongAPIView(generics.ListAPIView):
 
 
 class LyricCreateAPIView(generics.CreateAPIView):
-    permission_classes = (IsAuthenticated,)
+    permission_classes = (IsAuthenticated, IsMusician)
     serializer_class = LyricSerializer
 
     def perform_create(self, serializer: Serializer) -> None:
@@ -36,7 +37,7 @@ class LyricCreateAPIView(generics.CreateAPIView):
 
 
 class LyricDeleteAPIView(generics.DestroyAPIView):
-    permission_classes = (IsAuthenticated,)
+    permission_classes = (IsAuthenticated, IsMusician)
     serializer_class = LyricSerializer
 
     def get_object(self) -> Lyric:
@@ -63,7 +64,7 @@ class LyricLineTimecodeListAPIView(generics.ListAPIView):
 
 
 class LyricLineTimecodeDeleteAPIView(generics.DestroyAPIView):
-    permission_classes = (IsAuthenticated,)
+    permission_classes = (IsAuthenticated, IsMusician)
     serializer_class = LyricLineTimecodeSerializer
 
     def get_object(self) -> LyricLineTimecode:
@@ -84,7 +85,7 @@ class LyricLineTimecodeDeleteAPIView(generics.DestroyAPIView):
 
 
 class LyricLineTimecodeCreateAPIView(generics.CreateAPIView):
-    permission_classes = (IsAuthenticated,)
+    permission_classes = (IsAuthenticated, IsMusician)
     serializer_class = LyricLineTimecodeSerializer
 
     def perform_create(self, serializer: Serializer) -> None:
