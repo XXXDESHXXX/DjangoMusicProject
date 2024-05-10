@@ -3,7 +3,8 @@ from django.urls import path
 from songs.api.views import (
     UserSongLikeCreateAPIView,
     UserSongLikeDeleteAPIView,
-    SongCreateAPIView, SongDeleteAPIView,
+    SongCreateAPIView,
+    SongDeleteAPIView,
 )
 
 app_name = "songs"
