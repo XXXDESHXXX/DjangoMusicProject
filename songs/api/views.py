@@ -1,6 +1,8 @@
+from rest_framework.exceptions import PermissionDenied
 from rest_framework.generics import CreateAPIView, DestroyAPIView, get_object_or_404
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.serializers import Serializer
+from songs.models import Song
 
 from songs.api.serializers import (
     UserSongLikeSerializer,
@@ -24,10 +26,10 @@ class SongDeleteAPIView(DestroyAPIView):
     serializer_class = SongSerializer
 
     def get_object(self) -> Song:
-        song_id = self.kwargs.get("song_id")
-        user = self.request.user
-        song = get_object_or_404(Song, id=song_id)
-        return get_object_or_404(Song, song=song, user=user)
+        song = get_object_or_404(Song, id=self.kwargs.get("song_id"))
+        if song.user != self.request.user:
+            raise PermissionDenied("You do not have permission to delete this song.")
+        return song
 
 
 class UserSongLikeCreateAPIView(CreateAPIView):
