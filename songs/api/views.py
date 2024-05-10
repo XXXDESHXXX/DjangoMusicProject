@@ -28,7 +28,7 @@ class SongDeleteAPIView(DestroyAPIView):
     def get_object(self) -> Song:
         song = get_object_or_404(Song, id=self.kwargs.get("song_id"))
         if song.user != self.request.user:
-            raise PermissionDenied("You do not have permission to delete this song.")
+            raise PermissionDenied("You do not have permission for this action.")
         return song
 
 
