@@ -11,7 +11,7 @@ from lyrics.models import Lyric, LyricLineTimecode
 from lyrics.api.serializers import LyricSerializer, LyricLineTimecodeSerializer
 from lyrics.paginators import LyricLineTimecodePageLimitOffsetPagination
 from songs.models import Song
-from utils.permissions import IsMusician
+from utils.permissions import IsMusician, IsCurrentUserEqualsRequestUser
 
 
 class LyricSongAPIView(generics.ListAPIView):
@@ -23,18 +23,17 @@ class LyricSongAPIView(generics.ListAPIView):
 
 
 class LyricCreateAPIView(generics.CreateAPIView):
-    permission_classes = (IsAuthenticated, IsMusician)
+    permission_classes = (IsAuthenticated, IsCurrentUserEqualsRequestUser, IsMusician)
     serializer_class = LyricSerializer
 
-    def perform_create(self, serializer: Serializer) -> None:
+    def get_object(self) -> Song:
         song_id = self.kwargs.get("song_id")
+        song = get_object_or_404(Song, id=song_id)
+        self.check_object_permissions(self.request, song)
+        return song
 
-        song = Song.objects.get(id=song_id)
-
-        if song.user != self.request.user:
-            raise PermissionDenied("You do not have sufficient rights for this action")
-
-        serializer.save(song_id=song_id)
+    def perform_create(self, serializer: Serializer) -> None:
+        serializer.save(song=self.get_object())
 
 
 class LyricDeleteAPIView(generics.DestroyAPIView):
