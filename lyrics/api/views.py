@@ -1,7 +1,6 @@
 from django.db import IntegrityError
 from django.db.models import QuerySet
 from rest_framework import generics, status
-from rest_framework.exceptions import PermissionDenied
 from rest_framework.generics import get_object_or_404
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.request import Request
