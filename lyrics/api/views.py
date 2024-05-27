@@ -1,7 +1,7 @@
 from django.db import IntegrityError
 from django.db.models import QuerySet
 from rest_framework import generics, status
-from rest_framework.exceptions import PermissionDenied, ValidationError
+from rest_framework.exceptions import PermissionDenied
 from rest_framework.generics import get_object_or_404
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.request import Request
@@ -33,7 +33,7 @@ class LyricCreateAPIView(generics.CreateAPIView):
         self.check_object_permissions(self.request, song)
         return song
 
-    def create(self, request, *args, **kwargs) -> Response:
+    def create(self, request: Request, *args: tuple, **kwargs: dict) -> Response:
         try:
             return super().create(request, *args, **kwargs)
         except IntegrityError:
@@ -54,8 +54,7 @@ class LyricDeleteAPIView(generics.DestroyAPIView):
     serializer_class = LyricSerializer
 
     def get_object(self) -> Lyric:
-        lyric = get_object_or_404(Lyric, id=self.kwargs.get("lyric_id"))
-        return lyric
+        return get_object_or_404(Lyric, id=self.kwargs.get("lyric_id"))
 
     def destroy(self, request: Request, *args: tuple, **kwargs: dict) -> Response:
         instance = self.get_object()
@@ -75,7 +74,7 @@ class LyricLineTimecodeListAPIView(generics.ListAPIView):
 
 
 class LyricLineTimecodeDeleteAPIView(generics.DestroyAPIView):
-    permission_classes = (IsAuthenticated, IsMusician)
+    permission_classes = (IsAuthenticated, IsCurrentUserEqualsRequestUser, IsMusician)
     serializer_class = LyricLineTimecodeSerializer
 
     def get_object(self) -> LyricLineTimecode:
@@ -85,12 +84,8 @@ class LyricLineTimecodeDeleteAPIView(generics.DestroyAPIView):
 
     def destroy(self, request: Request, *args: tuple, **kwargs: dict) -> Response:
         instance = self.get_object()
-
         lyric = instance.lyric
-
-        if lyric.song.user != request.user:
-            raise PermissionDenied("You do not have sufficient rights for this action")
-
+        self.check_object_permissions(self.request, lyric.song)
         self.perform_destroy(instance)
         return Response(status=status.HTTP_204_NO_CONTENT)
 

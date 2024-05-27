@@ -10,7 +10,7 @@ class Lyric(models.Model):
     song = models.ForeignKey("songs.Song", on_delete=models.CASCADE)
 
     def __str__(self):
-        return f"lyrics for {self.song.name}"
+        return f"lyrics for {self.song.name}, {self.language}"
 
     class Meta:
         unique_together = ("language", "song")
@@ -22,7 +22,7 @@ class LyricLineTimecode(models.Model):
     text_line = models.CharField(max_length=128)
 
     class Meta:
-        unique_together = ("timecode", "text_line")
+        unique_together = ("lyric", "timecode")
 
     def __str__(self):
         return self.text_line
