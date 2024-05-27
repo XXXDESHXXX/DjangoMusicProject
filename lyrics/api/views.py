@@ -1,6 +1,7 @@
+from django.db import IntegrityError
 from django.db.models import QuerySet
 from rest_framework import generics, status
-from rest_framework.exceptions import PermissionDenied
+from rest_framework.exceptions import PermissionDenied, ValidationError
 from rest_framework.generics import get_object_or_404
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.request import Request
@@ -32,24 +33,34 @@ class LyricCreateAPIView(generics.CreateAPIView):
         self.check_object_permissions(self.request, song)
         return song
 
+    def create(self, request, *args, **kwargs) -> Response:
+        try:
+            return super().create(request, *args, **kwargs)
+        except IntegrityError:
+            return Response(
+                {
+                    "error": "IntegrityError",
+                    "detail": "This combination of language and song already exists.",
+                },
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
     def perform_create(self, serializer: Serializer) -> None:
         serializer.save(song=self.get_object())
 
 
 class LyricDeleteAPIView(generics.DestroyAPIView):
-    permission_classes = (IsAuthenticated, IsMusician)
+    permission_classes = (IsAuthenticated, IsCurrentUserEqualsRequestUser, IsMusician)
     serializer_class = LyricSerializer
 
     def get_object(self) -> Lyric:
-        return get_object_or_404(Lyric, id=self.kwargs.get("lyric_id"))
+        lyric = get_object_or_404(Lyric, id=self.kwargs.get("lyric_id"))
+        return lyric
 
     def destroy(self, request: Request, *args: tuple, **kwargs: dict) -> Response:
         instance = self.get_object()
         song = instance.song
-
-        if song.user != request.user:
-            raise PermissionDenied("You do not have sufficient rights for this action")
-
+        self.check_object_permissions(self.request, song)
         self.perform_destroy(instance)
         return Response(status=status.HTTP_204_NO_CONTENT)
 

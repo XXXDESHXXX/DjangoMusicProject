@@ -16,4 +16,4 @@ class IsMusician(permissions.BasePermission):
 
 class IsCurrentUserEqualsRequestUser(permissions.BasePermission):
     def has_object_permission(self, request: Request, view: View, obj: Model) -> bool:
-        return obj.user == request.user # noqa
+        return obj.user == request.user  # noqa
