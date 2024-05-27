@@ -91,21 +91,26 @@ class LyricLineTimecodeDeleteAPIView(generics.DestroyAPIView):
 
 
 class LyricLineTimecodeCreateAPIView(generics.CreateAPIView):
-    permission_classes = (IsAuthenticated, IsMusician)
+    permission_classes = (IsAuthenticated, IsCurrentUserEqualsRequestUser, IsMusician)
     serializer_class = LyricLineTimecodeSerializer
 
-    def perform_create(self, serializer: Serializer) -> None:
+    def get_object(self) -> Lyric:
         lyric_id = self.kwargs.get("lyric_id")
+        lyric = get_object_or_404(Lyric, id=lyric_id)
+        self.check_object_permissions(self.request, lyric.song)
+        return lyric
 
-        serializer = self.get_serializer(data=self.request.data)
+    def create(self, request: Request, *args: tuple, **kwargs: dict) -> Response:
+        try:
+            return super().create(request, *args, **kwargs)
+        except IntegrityError:
+            return Response(
+                {
+                    "error": "IntegrityError",
+                    "detail": "This timecode already exists.",
+                },
+                status=status.HTTP_400_BAD_REQUEST,
+            )
 
-        serializer.is_valid(raise_exception=True)
-
-        lyric = Lyric.objects.get(id=lyric_id)
-
-        if lyric.song.user != self.request.user:
-            raise PermissionDenied("You do not have sufficient rights for this action")
-
-        serializer.save(
-            lyric_id=lyric_id,
-        )
+    def perform_create(self, serializer: Serializer) -> None:
+        serializer.save(lyric=self.get_object())
