@@ -1,3 +1,5 @@
+from typing import Any
+
 from django.contrib.auth import get_user_model
 from django.db import IntegrityError
 from django.shortcuts import get_object_or_404
@@ -19,15 +21,8 @@ class UserFollowCreateAPIView(CreateAPIView):
     serializer_class = UserFollowCreateSerializer
 
     def create(self, request: Request, *args: tuple, **kwargs: dict) -> Response:
-        user_to_id = request.data.get("user_to")
-        if user_to_id == request.user.id:
-            return Response(
-                {
-                    "error": "IntegrityError",
-                    "detail": "You cannot follow yourself",
-                },
-                status=status.HTTP_400_BAD_REQUEST,
-            )
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
         try:
             return super().create(request, *args, **kwargs)
         except IntegrityError:
@@ -39,6 +34,11 @@ class UserFollowCreateAPIView(CreateAPIView):
                 status=status.HTTP_400_BAD_REQUEST,
             )
 
+    def get_serializer_context(self) -> dict[str, Any]:
+        context = super().get_serializer_context()
+        context["user_from"] = self.request.user
+        return context
+    
     def perform_create(self, serializer: Serializer) -> None:
         serializer.save(user_from=self.request.user)
 

@@ -13,3 +13,8 @@ class UserFollowCreateSerializer(UserFollowSerializer):
 
     class Meta(UserFollowSerializer.Meta):
         read_only_fields = UserFollowSerializer.Meta.read_only_fields + ("user_from",)
+
+    def validate_user_to(self, user_to):
+        if self.context.get("user_from") == user_to:
+            raise serializers.ValidationError("You cannot follow yourself.")
+        return user_to
