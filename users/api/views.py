@@ -38,7 +38,7 @@ class UserFollowCreateAPIView(CreateAPIView):
         context = super().get_serializer_context()
         context["user_from"] = self.request.user
         return context
-    
+
     def perform_create(self, serializer: Serializer) -> None:
         serializer.save(user_from=self.request.user)
 

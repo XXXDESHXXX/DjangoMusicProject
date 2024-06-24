@@ -8,6 +8,7 @@ from rest_framework.response import Response
 from rest_framework.serializers import Serializer
 
 from playlists.models import Playlist, PlaylistSong
+from utils.permissions import IsCurrentUserEqualsRequestUser
 from .serializers import PlaylistSerializer, PlaylistSongSerializer
 from ..paginators import UserPlaylistPageLimitOffsetPagination
 
@@ -18,7 +19,6 @@ class UserPlaylistListAPIView(generics.ListAPIView):
 
     def get_queryset(self) -> QuerySet:
         user_id = self.kwargs.get("user_id")
-
         if self.request.user.id != user_id:
             return Playlist.objects.filter(is_private=False, user_id=user_id)
         return Playlist.objects.filter(user_id=user_id)
@@ -33,13 +33,19 @@ class PlaylistCreateAPIView(generics.CreateAPIView):
 
 
 class PlaylistDeleteAPIView(generics.DestroyAPIView):
-    permission_classes = (IsAuthenticated,)
+    permission_classes = (IsAuthenticated, IsCurrentUserEqualsRequestUser)
     serializer_class = PlaylistSerializer
 
     def get_object(self) -> Playlist:
         return get_object_or_404(
-            Playlist, user=self.request.user, id=self.kwargs.get("playlist_id")
+            Playlist, id=self.kwargs.get("playlist_id")
         )
+
+    def destroy(self, request: Request, *args: tuple, **kwargs: dict) -> Response:
+        playlist = self.get_object()
+        self.check_object_permissions(self.request, playlist)
+        self.perform_destroy(playlist)
+        return Response(status=status.HTTP_204_NO_CONTENT)
 
 
 class PlaylistUpdateAPIView(generics.UpdateAPIView):

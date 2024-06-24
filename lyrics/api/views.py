@@ -39,7 +39,7 @@ class LyricCreateAPIView(generics.CreateAPIView):
             return Response(
                 {
                     "error": "IntegrityError",
-                    "detail": "This combination of language and song already exists.",
+                    "detail": "Bad request.",
                 },
                 status=status.HTTP_400_BAD_REQUEST,
             )
@@ -106,7 +106,7 @@ class LyricLineTimecodeCreateAPIView(generics.CreateAPIView):
             return Response(
                 {
                     "error": "IntegrityError",
-                    "detail": "This timecode already exists.",
+                    "detail": "Bad request.",
                 },
                 status=status.HTTP_400_BAD_REQUEST,
             )
