@@ -37,9 +37,7 @@ class PlaylistDeleteAPIView(generics.DestroyAPIView):
     serializer_class = PlaylistSerializer
 
     def get_object(self) -> Playlist:
-        return get_object_or_404(
-            Playlist, id=self.kwargs.get("playlist_id")
-        )
+        return get_object_or_404(Playlist, id=self.kwargs.get("playlist_id"))
 
     def destroy(self, request: Request, *args: tuple, **kwargs: dict) -> Response:
         playlist = self.get_object()
@@ -49,13 +47,22 @@ class PlaylistDeleteAPIView(generics.DestroyAPIView):
 
 
 class PlaylistUpdateAPIView(generics.UpdateAPIView):
-    permission_classes = (IsAuthenticated,)
+    permission_classes = (IsAuthenticated, IsCurrentUserEqualsRequestUser)
     serializer_class = PlaylistSerializer
 
     def get_object(self) -> Playlist:
-        return get_object_or_404(
-            Playlist, user=self.request.user, id=self.kwargs.get("playlist_id")
-        )
+        return get_object_or_404(Playlist, id=self.kwargs.get("playlist_id"))
+
+    def update(self, request: Request, *args: tuple, **kwargs: dict) -> Response:
+        playlist = self.get_object()
+        self.check_object_permissions(self.request, playlist)
+        serializer = self.get_serializer(playlist, data=request.data, partial=True)
+        serializer.is_valid(raise_exception=True)
+        self.perform_update(serializer)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+    def perform_update(self, serializer: Serializer):
+        serializer.save()
 
 
 class PlaylistSongCreateAPIView(generics.CreateAPIView):
