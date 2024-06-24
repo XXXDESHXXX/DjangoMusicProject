@@ -1,3 +1,4 @@
+from django.db import IntegrityError
 from django.db.models import QuerySet
 from rest_framework import generics, status
 from rest_framework.exceptions import PermissionDenied
@@ -61,20 +62,22 @@ class PlaylistUpdateAPIView(generics.UpdateAPIView):
         self.perform_update(serializer)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
-    def perform_update(self, serializer: Serializer):
+    def perform_update(self, serializer: Serializer) -> None:
         serializer.save()
 
 
 class PlaylistSongCreateAPIView(generics.CreateAPIView):
-    permission_classes = (IsAuthenticated,)
+    permission_classes = (IsAuthenticated, IsCurrentUserEqualsRequestUser)
     serializer_class = PlaylistSongSerializer
 
-    def perform_create(self, serializer: Serializer) -> None:
-        playlist = get_object_or_404(Playlist, id=self.kwargs.get("playlist_id"))
-        if playlist.user != self.request.user:
-            raise PermissionDenied("You do not have permission for this action.")
+    def get_object(self) -> Playlist:
+        playlist_id = self.kwargs.get("playlist_id")
+        playlist = get_object_or_404(Playlist, id=playlist_id)
+        self.check_object_permissions(self.request, playlist)
+        return playlist
 
-        serializer.save(playlist=playlist)
+    def perform_create(self, serializer: Serializer) -> None:
+        serializer.save(playlist=self.get_object())
 
 
 class PlaylistSongDeleteAPIView(generics.DestroyAPIView):
