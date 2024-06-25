@@ -5,6 +5,7 @@ from rest_framework.test import APITestCase, APIClient
 from genres.models import Genre
 from songs.models import Song, UserSongLike
 from users.models import User
+from utils.permissions import IsMusician
 
 
 class UserSongLikeCreateAPIViewTest(APITestCase):
@@ -57,3 +58,36 @@ class UserSongLikeDeleteAPIViewTest(APITestCase):
         )
         response = self.client.delete(url)
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+
+
+class SongCreateAPIViewTest(APITestCase):
+    def setUp(self):
+        self.client = APIClient()
+        self.genre = Genre.objects.create(name="Jazz")
+        self.user = User.objects.create_user(username='testuser', password='password')
+        self.musician_user = User.objects.create_user(username='musicianuser', password='password',
+                                                      role=User.RoleChoices.MUSICIAN)
+        self.url = reverse('songs:api:create_song')
+
+    def test_create_song_unauthenticated(self):
+        data = {
+            'name': 'New Song',
+        }
+        response = self.client.post(self.url, data, format='json')
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+
+    def test_create_song_without_musician_permission(self):
+        self.client.login(username='testuser', password='password')
+        data = {
+            'name': 'New Song',
+        }
+        response = self.client.post(self.url, data, format='json')
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+
+    def test_create_song_with_missing_fields(self):
+        self.client.login(username='musicianuser', password='password')
+        data = {
+            'name': '',
+        }
+        response = self.client.post(self.url, data, format='json')
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
