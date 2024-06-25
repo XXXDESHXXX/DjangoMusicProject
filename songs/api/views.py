@@ -1,5 +1,6 @@
+from django.db import IntegrityError
 from rest_framework import status
-from rest_framework.exceptions import PermissionDenied, ValidationError
+from rest_framework.exceptions import PermissionDenied, ValidationError, NotFound
 from rest_framework.generics import CreateAPIView, DestroyAPIView, get_object_or_404
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.request import Request
@@ -41,16 +42,28 @@ class UserSongLikeCreateAPIView(CreateAPIView):
     permission_classes = (IsAuthenticated,)
     serializer_class = UserSongLikeCreateSerializer
 
+    def get_object(self) -> Song:
+        song_id = self.request.data.get("liked_song")
+        song = get_object_or_404(Song, id=song_id)
+        return song
+
     def create(self, request: Request, *args: tuple, **kwargs: dict) -> Response:
-        liked_song_id = self.request.data.get("liked_song")
-        if not Song.objects.filter(id=liked_song_id).exists():
-            return Response({"Error": "Bad Request"})
-        return super().create(request, *args, **kwargs)
+        self.get_object()
+        try:
+            return super().create(request, *args, **kwargs)
+        except IntegrityError:
+            return Response(
+                {
+                    "error": "IntegrityError",
+                    "detail": "Bad request.",
+                },
+                status=status.HTTP_400_BAD_REQUEST,
+            )
 
     def perform_create(self, serializer: Serializer) -> None:
         user = self.request.user
-
-        serializer.save(user=user)
+        song = self.get_object()
+        serializer.save(user=user, liked_song=song)
 
 
 class UserSongLikeDeleteAPIView(DestroyAPIView):
