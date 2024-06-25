@@ -126,7 +126,7 @@ class PlaylistDeleteAPIViewTest(APITestCase):
 
         response = self.client.delete(url)
 
-        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
 
 
 class PlaylistUpdateAPIViewTest(APITestCase):
@@ -171,7 +171,7 @@ class PlaylistUpdateAPIViewTest(APITestCase):
             username="otheruser", password="testpassword"
         )
         response = self._test_update_playlist_with_user(other_user)
-        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
 
 
 class PlaylistSongCreateAPIViewTestCase(APITestCase):
@@ -254,7 +254,7 @@ class PlaylistSongDeleteAPIViewTestCase(APITestCase):
     def test_delete_playlist_song_success(self) -> None:
         url = reverse(
             "playlists:api:delete_playlist_song",
-            kwargs={"playlist_id": self.playlist.id},
+            kwargs={"playlist_song_id": self.playlist_song.id},
         )
         response = self.client.delete(url)
 
@@ -265,14 +265,14 @@ class PlaylistSongDeleteAPIViewTestCase(APITestCase):
         self.client.logout()
         url = reverse(
             "playlists:api:delete_playlist_song",
-            kwargs={"playlist_id": self.playlist.id},
+            kwargs={"playlist_song_id": self.playlist_song.id},
         )
         response = self.client.delete(url)
 
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
 
     def test_delete_playlist_song_not_found(self) -> None:
-        url = reverse("playlists:api:delete_playlist_song", kwargs={"playlist_id": 999})
+        url = reverse("playlists:api:delete_playlist_song", kwargs={"playlist_song_id": 999})
         response = self.client.delete(url)
 
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
