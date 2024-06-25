@@ -54,11 +54,14 @@ class UserSongLikeCreateAPIView(CreateAPIView):
 
 
 class UserSongLikeDeleteAPIView(DestroyAPIView):
-    permission_classes = (IsAuthenticated,)
+    permission_classes = (IsAuthenticated, IsCurrentUserEqualsRequestUser)
     serializer_class = UserSongLikeSerializer
 
     def get_object(self) -> UserSongLike:
-        song_id = self.kwargs.get("song_id")
-        user = self.request.user
-        song = get_object_or_404(Song, id=song_id)
-        return get_object_or_404(UserSongLike, user=user, liked_song=song)
+        return get_object_or_404(UserSongLike, id=self.kwargs.get("song_id"))
+
+    def destroy(self, request: Request, *args: tuple, **kwargs: dict) -> Response:
+        user_song_like = self.get_object()
+        self.check_object_permissions(self.request, user_song_like)
+        self.perform_destroy(user_song_like)
+        return Response(status=status.HTTP_204_NO_CONTENT)
