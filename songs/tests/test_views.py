@@ -91,3 +91,41 @@ class SongCreateAPIViewTest(APITestCase):
         }
         response = self.client.post(self.url, data, format='json')
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+
+class SongDeleteAPIViewTest(APITestCase):
+    def setUp(self):
+        self.client = APIClient()
+        self.genre = Genre.objects.create(name="Jazz")
+        self.user = User.objects.create_user(username='testuser', password='password')
+        self.musician_user = User.objects.create_user(username='musicianuser', password='password',
+                                                      role=User.RoleChoices.MUSICIAN)
+        self.song = Song.objects.create(name='Test Song', genre=self.genre, user=self.musician_user)
+        self.url = reverse('songs:api:delete_song', kwargs={'song_id': self.song.id})
+
+    def test_delete_song_successfully(self):
+        self.client.login(username='musicianuser', password='password')
+        response = self.client.delete(self.url)
+        self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
+        self.assertFalse(Song.objects.filter(id=self.song.id).exists())
+
+    def test_delete_song_unauthenticated(self):
+        response = self.client.delete(self.url)
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+
+    def test_delete_song_without_musician_permission(self):
+        self.client.login(username='testuser', password='password')
+        response = self.client.delete(self.url)
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+
+    def test_delete_song_not_owner(self):
+        another_musician = User.objects.create_user(username='anothermusician', password='password', role=User.RoleChoices.MUSICIAN)
+        self.client.login(username='anothermusician', password='password')
+        response = self.client.delete(self.url)
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+
+    def test_delete_non_existent_song(self):
+        self.client.login(username='musicianuser', password='password')
+        non_existent_url = reverse('songs:api:delete_song', kwargs={'song_id': 9999})
+        response = self.client.delete(non_existent_url)
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
