@@ -1,5 +1,5 @@
 from rest_framework import status
-from rest_framework.exceptions import PermissionDenied
+from rest_framework.exceptions import PermissionDenied, ValidationError
 from rest_framework.generics import CreateAPIView, DestroyAPIView, get_object_or_404
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.request import Request
@@ -40,6 +40,12 @@ class SongDeleteAPIView(DestroyAPIView):
 class UserSongLikeCreateAPIView(CreateAPIView):
     permission_classes = (IsAuthenticated,)
     serializer_class = UserSongLikeCreateSerializer
+
+    def create(self, request: Request, *args: tuple, **kwargs: dict) -> Response:
+        liked_song_id = self.request.data.get("liked_song")
+        if not Song.objects.filter(id=liked_song_id).exists():
+            return Response({"Error": "Bad Request"})
+        return super().create(request, *args, **kwargs)
 
     def perform_create(self, serializer: Serializer) -> None:
         user = self.request.user
