@@ -10,7 +10,7 @@ urlpatterns = [
         name="user_follow_create",
     ),
     path(
-        "users/follows/delete/<int:user_id>/",
+        "users/follows/delete/<int:user_follow_id>",
         UserFollowDeleteAPIView.as_view(),
         name="user_follow_delete",
     ),

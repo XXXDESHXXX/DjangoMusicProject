@@ -11,7 +11,8 @@ from rest_framework.response import Response
 from rest_framework.serializers import Serializer
 
 from users.models import UserFollow
-from .serializers import UserFollowCreateSerializer
+from utils.permissions import IsCurrentUserEqualsRequestUser
+from .serializers import UserFollowCreateSerializer, UserFollowSerializer
 
 User = get_user_model()
 
@@ -45,9 +46,19 @@ class UserFollowCreateAPIView(CreateAPIView):
 
 class UserFollowDeleteAPIView(DestroyAPIView):
     permission_classes = (IsAuthenticated,)
+    serializer_class = UserFollowSerializer
 
     def get_object(self) -> UserFollow:
-        user_id = self.kwargs.get("user_id")
-        user_to = get_object_or_404(User, id=user_id)
-        user_from = self.request.user
-        return get_object_or_404(UserFollow, user_from=user_from, user_to=user_to)
+        return get_object_or_404(UserFollow, id=self.kwargs.get("user_follow_id"))
+
+    def destroy(self, request: Request, *args: tuple, **kwargs: dict) -> Response:
+        follow = self.get_object()
+
+        if follow.user_from != request.user:
+            return Response({"Error": "Bad Request",
+                             "detail": "You don't have permission for this action.",
+                             },
+                            status.HTTP_400_BAD_REQUEST,
+                            )
+        self.perform_destroy(follow)
+        return Response(status=status.HTTP_204_NO_CONTENT)
