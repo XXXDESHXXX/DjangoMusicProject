@@ -56,7 +56,7 @@ class UserFollowDeleteAPIViewTest(APITestCase):
         )
         self.client.force_authenticate(user=self.user_from)
         self.url = reverse(
-            "users:api:user_follow_delete", kwargs={"user_id": self.user_to.id}
+            "users:api:user_follow_delete", kwargs={"user_follow_id": self.user_follow.id}
         )
 
     def test_delete_user_follow(self):
@@ -67,7 +67,7 @@ class UserFollowDeleteAPIViewTest(APITestCase):
     def test_delete_nonexistent_user_follow(self):
         non_existent_user_id = self.user_to.id + 1
         url = reverse(
-            "users:api:user_follow_delete", kwargs={"user_id": non_existent_user_id}
+            "users:api:user_follow_delete", kwargs={"user_follow_id": non_existent_user_id}
         )
         response = self.client.delete(url)
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
