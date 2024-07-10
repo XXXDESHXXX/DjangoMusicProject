@@ -5,12 +5,12 @@ app_name = "users"
 
 urlpatterns = [
     path(
-        "users/follows/create/",
+        "follows/create/",
         UserFollowCreateAPIView.as_view(),
         name="user_follow_create",
     ),
     path(
-        "users/follows/delete/<int:user_follow_id>",
+        "follows/delete/<int:user_follow_id>/",
         UserFollowDeleteAPIView.as_view(),
         name="user_follow_delete",
     ),

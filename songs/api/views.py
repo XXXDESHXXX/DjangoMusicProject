@@ -1,6 +1,5 @@
 from django.db import IntegrityError
 from rest_framework import status
-from rest_framework.exceptions import PermissionDenied, ValidationError, NotFound
 from rest_framework.generics import CreateAPIView, DestroyAPIView, get_object_or_404
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.request import Request
