@@ -1,6 +1,7 @@
 from rest_framework import serializers
 from songs.models import UserSongLike
 from songs.models import Song
+from songs.validators import validate_song_file
 
 
 class UserSongLikeSerializer(serializers.ModelSerializer):
@@ -16,6 +17,8 @@ class UserSongLikeCreateSerializer(UserSongLikeSerializer):
 
 
 class SongSerializer(serializers.ModelSerializer):
+    file = serializers.FileField(validators=[validate_song_file])
+
     class Meta:
         model = Song
         fields = ("id", "name", "file", "likes", "genre", "user")
