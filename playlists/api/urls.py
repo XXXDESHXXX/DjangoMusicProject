@@ -6,7 +6,7 @@ from playlists.api.views import (
     PlaylistDeleteAPIView,
     PlaylistUpdateAPIView,
     PlaylistSongCreateAPIView,
-    PlaylistSongDeleteAPIView,
+    PlaylistSongDeleteAPIView, UserPlaylistSongListAPIView,
 )
 
 app_name = "playlists"
@@ -17,6 +17,11 @@ urlpatterns = [
         UserPlaylistListAPIView.as_view(),
         name="user_playlist_list",
     ),
+    path(
+        "user/playlist_songs/<int:playlist_id>/",
+        UserPlaylistSongListAPIView.as_view(),
+        name="user_playlist_song_list",
+    ),
     path("create/", PlaylistCreateAPIView.as_view(), name="playlist_create"),
     path(
         "delete/<int:playlist_id>/",
@@ -24,7 +29,7 @@ urlpatterns = [
         name="playlist_delete",
     ),
     path(
-        "update/<int:playlist_id/",
+        "update/<int:playlist_id>/",
         PlaylistUpdateAPIView.as_view(),
         name="playlist_update",
     ),

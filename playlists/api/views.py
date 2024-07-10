@@ -11,7 +11,24 @@ from rest_framework.serializers import Serializer
 from playlists.models import Playlist, PlaylistSong
 from utils.permissions import IsCurrentUserEqualsRequestUser
 from .serializers import PlaylistSerializer, PlaylistSongSerializer
-from ..paginators import UserPlaylistPageLimitOffsetPagination
+from ..paginators import UserPlaylistPageLimitOffsetPagination, UserPlaylistSongPageLimitOffsetPagination
+
+
+class UserPlaylistSongListAPIView(generics.ListAPIView):
+    serializer_class = PlaylistSongSerializer
+    pagination_class = UserPlaylistSongPageLimitOffsetPagination
+
+    def get_queryset(self) -> QuerySet:
+        playlist_id = self.kwargs.get("playlist_id")
+        playlist = get_object_or_404(Playlist, id=playlist_id)
+        self.check_object_permissions(self.request, playlist)
+        return PlaylistSong.objects.filter(playlist_id=playlist_id)
+
+    def check_object_permissions(self, request: Request, obj: Playlist) -> None:
+        permission = IsCurrentUserEqualsRequestUser()
+        if not permission.has_object_permission(request, self, obj):
+            if obj.is_private:
+                raise PermissionDenied({"Error": "Bad Request"})
 
 
 class UserPlaylistListAPIView(generics.ListAPIView):
