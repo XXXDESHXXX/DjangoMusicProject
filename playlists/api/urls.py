@@ -6,7 +6,8 @@ from playlists.api.views import (
     PlaylistDeleteAPIView,
     PlaylistUpdateAPIView,
     PlaylistSongCreateAPIView,
-    PlaylistSongDeleteAPIView, UserPlaylistSongListAPIView,
+    PlaylistSongDeleteAPIView,
+    UserPlaylistSongListAPIView,
 )
 
 app_name = "playlists"

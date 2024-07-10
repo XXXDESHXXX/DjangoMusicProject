@@ -1,6 +1,9 @@
 from rest_framework.pagination import LimitOffsetPagination
 
-from playlists.constants import USER_PLAYLIST_LIST_PAGINATE_BY, USER_PLAYLIST_SONG_LIST_PAGINATE_BY
+from playlists.constants import (
+    USER_PLAYLIST_LIST_PAGINATE_BY,
+    USER_PLAYLIST_SONG_LIST_PAGINATE_BY,
+)
 
 
 class UserPlaylistPageLimitOffsetPagination(LimitOffsetPagination):
@@ -9,4 +12,3 @@ class UserPlaylistPageLimitOffsetPagination(LimitOffsetPagination):
 
 class UserPlaylistSongPageLimitOffsetPagination(LimitOffsetPagination):
     default_limit = USER_PLAYLIST_SONG_LIST_PAGINATE_BY
-

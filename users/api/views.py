@@ -55,10 +55,12 @@ class UserFollowDeleteAPIView(DestroyAPIView):
         follow = self.get_object()
 
         if follow.user_from != request.user:
-            return Response({"Error": "Bad Request",
-                             "detail": "You don't have permission for this action.",
-                             },
-                            status.HTTP_400_BAD_REQUEST,
-                            )
+            return Response(
+                {
+                    "Error": "Bad Request",
+                    "detail": "You don't have permission for this action.",
+                },
+                status.HTTP_400_BAD_REQUEST,
+            )
         self.perform_destroy(follow)
         return Response(status=status.HTTP_204_NO_CONTENT)

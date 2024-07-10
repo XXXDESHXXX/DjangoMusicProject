@@ -11,7 +11,10 @@ from rest_framework.serializers import Serializer
 from playlists.models import Playlist, PlaylistSong
 from utils.permissions import IsCurrentUserEqualsRequestUser
 from .serializers import PlaylistSerializer, PlaylistSongSerializer
-from ..paginators import UserPlaylistPageLimitOffsetPagination, UserPlaylistSongPageLimitOffsetPagination
+from ..paginators import (
+    UserPlaylistPageLimitOffsetPagination,
+    UserPlaylistSongPageLimitOffsetPagination,
+)
 
 
 class UserPlaylistSongListAPIView(generics.ListAPIView):
