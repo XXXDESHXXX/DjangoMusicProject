@@ -52,6 +52,8 @@ INSTALLED_APPS = [
     "songs",
     "users",
     'rest_framework',
+    'rest_framework.authtoken',
+    'djoser',
 ]
 
 MIDDLEWARE = [
@@ -147,3 +149,13 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 # Users
 AUTH_USER_MODEL = "users.User"
+
+# Rest Framework
+REST_FRAMEWORK = {
+    "DEFAULT_AUTHENTICATION_CLASSES": [
+        'rest_framework.authentication.TokenAuthentication',
+    ],
+    'DEFAULT_PERMISSION_CLASSES': [
+        'rest_framework.permissions.IsAuthenticated',
+    ],
+}
