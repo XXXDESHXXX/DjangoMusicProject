@@ -1,16 +1,13 @@
-from urllib.request import Request
-
-from django.core.exceptions import PermissionDenied
 from django.db.models import Model
 from django.views import View
 from rest_framework import permissions
+from rest_framework.request import Request
 
-from songs.models import Song
 from users.models import User
 
 
 class IsMusician(permissions.BasePermission):
-    def has_permission(self, request, view) -> bool:
+    def has_permission(self, request: Request, view: View) -> bool:
         return request.user.role == User.RoleChoices.MUSICIAN
 
 
