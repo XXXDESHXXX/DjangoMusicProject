@@ -4,14 +4,13 @@ from django.contrib.auth import get_user_model
 from django.db import IntegrityError
 from django.shortcuts import get_object_or_404
 from rest_framework import status
-from rest_framework.generics import DestroyAPIView, CreateAPIView
+from rest_framework.generics import DestroyAPIView, CreateAPIView, ListAPIView
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.request import Request
 from rest_framework.response import Response
 from rest_framework.serializers import Serializer
 
 from users.models import UserFollow
-from utils.permissions import IsCurrentUserEqualsRequestUser
 from .serializers import UserFollowCreateSerializer, UserFollowSerializer
 
 User = get_user_model()
@@ -42,6 +41,15 @@ class UserFollowCreateAPIView(CreateAPIView):
 
     def perform_create(self, serializer: Serializer) -> None:
         serializer.save(user_from=self.request.user)
+
+
+class UserFollowListAPIView(ListAPIView):
+    serializer_class = UserFollowSerializer
+    permission_classes = (IsAuthenticated,)
+
+    def get_queryset(self):
+        user_id = self.kwargs.get('user_id')
+        return UserFollow.objects.filter(user_from=user_id)
 
 
 class UserFollowDeleteAPIView(DestroyAPIView):

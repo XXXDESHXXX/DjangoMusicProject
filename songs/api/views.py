@@ -1,6 +1,6 @@
 from django.db import IntegrityError
 from rest_framework import status
-from rest_framework.generics import CreateAPIView, DestroyAPIView, get_object_or_404
+from rest_framework.generics import CreateAPIView, DestroyAPIView, get_object_or_404, ListAPIView
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.request import Request
 from rest_framework.response import Response
@@ -35,6 +35,15 @@ class SongDeleteAPIView(DestroyAPIView):
         self.check_object_permissions(self.request, song)
         self.perform_destroy(song)
         return Response(status=status.HTTP_204_NO_CONTENT)
+
+
+class UserSongLikeListAPIView(ListAPIView):
+    serializer_class = UserSongLikeSerializer
+    permission_classes = (IsAuthenticated,)
+
+    def get_queryset(self):
+        song_id = self.kwargs.get('song_id')
+        return UserSongLike.objects.filter(liked_song=song_id)
 
 
 class UserSongLikeCreateAPIView(CreateAPIView):

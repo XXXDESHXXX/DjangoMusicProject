@@ -4,7 +4,7 @@ from songs.api.views import (
     UserSongLikeCreateAPIView,
     UserSongLikeDeleteAPIView,
     SongCreateAPIView,
-    SongDeleteAPIView,
+    SongDeleteAPIView, UserSongLikeListAPIView,
 )
 
 app_name = "songs"
@@ -22,4 +22,5 @@ urlpatterns = [
         UserSongLikeDeleteAPIView.as_view(),
         name="user_like_delete",
     ),
+    path('song/<int:song_id>/likes/', UserSongLikeListAPIView.as_view(), name='song-likes'),
 ]

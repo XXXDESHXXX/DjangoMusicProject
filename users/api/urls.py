@@ -1,5 +1,5 @@
 from django.urls import path
-from .views import UserFollowCreateAPIView, UserFollowDeleteAPIView
+from .views import UserFollowCreateAPIView, UserFollowDeleteAPIView, UserFollowListAPIView
 
 app_name = "users"
 
@@ -14,4 +14,5 @@ urlpatterns = [
         UserFollowDeleteAPIView.as_view(),
         name="user_follow_delete",
     ),
+    path('user/<int:user_id>/follows/', UserFollowListAPIView.as_view(), name='user_follows'),
 ]
